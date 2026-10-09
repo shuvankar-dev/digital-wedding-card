@@ -1,5 +1,5 @@
 /* =========================================================
-   Shubho Bibaho — Prity & Shubhankar
+   Shubho Bibaho — Prity & Shubhankar (bride-side invitation)
    ========================================================= */
 (() => {
   'use strict';
@@ -7,11 +7,11 @@
   /* ---------- editable details ---------- */
   const CONFIG = {
     phone: '918101300532',
-    // Replace with the exact venue (a place name, an address, or "lat,lng")
-    // once it is confirmed — the map, the directions button and the calendar
-    // entries all read from here.
-    mapQuery: 'Ghoshpara, Kestopur, Kolkata, West Bengal',
-    venue: 'Sudhakunja, Ghoshpara, Kolkata',
+    // Replace with the exact location (a place name, an address, or
+    // "lat,lng") once it is confirmed — the map, the directions button and
+    // the calendar entry all read from here.
+    mapQuery: 'Odhanpur, Deganga, North 24 Parganas, West Bengal 743423',
+    venue: 'Bride\'s residence, Vill. Odhanpur, P.O. Sohai Kumarpur, P.S. Deganga, North 24 Parganas, PIN 743423',
     // Optional background music. Drop an mp3 at this path (e.g. a shehnai
     // track) and it plays instead of the built-in tanpura drone.
     musicFile: 'assets/audio/music.mp3',
@@ -20,12 +20,7 @@
       wedding: {
         title: 'Shubho Bibaho · Prity & Shubhankar',
         dates: '20261212/20261213',
-        details: 'শুভবিবাহ — ২৫শে অগ্রহায়ণ, ১৪৩৩ (ইং ১২ই ডিসেম্বর, ২০২৬) শনিবার',
-      },
-      reception: {
-        title: 'Bou-Bhat & Reception · Prity & Shubhankar',
-        dates: '20261214/20261215',
-        details: 'বধূবরণ ও প্রীতিভোজ — ২৭শে অগ্রহায়ণ, ১৪৩৩ (ইং ১৪ই ডিসেম্বর, ২০২৬) সোমবার',
+        details: 'শুভবিবাহ — ২৫শে অগ্রহায়ণ, ১৪৩৩ (ইং ১২ই ডিসেম্বর, ২০২৬) শনিবার। পাত্রীর বাসভবন, ওধানপুর, দেগঙ্গা।',
       },
     },
   };
@@ -81,8 +76,8 @@
       en: 'Namaskar! We received the wedding invitation of Prity & Shubhankar. Warm wishes and blessings to the couple!',
     },
     share: {
-      bn: 'প্রীতি ও শুভঙ্করের শুভবিবাহের নিমন্ত্রণপত্র — ১২ই ডিসেম্বর, ২০২৬',
-      en: 'Wedding invitation · Prity & Shubhankar · 12 December 2026',
+      bn: 'প্রীতি ও শুভঙ্করের শুভবিবাহের নিমন্ত্রণপত্র — ১২ই ডিসেম্বর, ২০২৬, দেগঙ্গা',
+      en: 'Wedding invitation · Prity & Shubhankar · 12 December 2026 · Deganga',
     },
     copied: { bn: 'লিংক কপি হয়েছে', en: 'Link copied' },
     guest: { bn: 'শ্রদ্ধেয় / প্রিয়', en: 'Dear' },
@@ -149,7 +144,7 @@
   function updateLinks() {
     const q = encodeURIComponent(CONFIG.mapQuery);
     const frame = $('#mapFrame');
-    const src = `https://maps.google.com/maps?q=${q}&z=15&output=embed`;
+    const src = `https://maps.google.com/maps?q=${q}&z=14&output=embed`;
     if (frame.getAttribute('src') !== src) frame.setAttribute('src', src);
     $('#dirBtn').href = `https://www.google.com/maps/dir/?api=1&destination=${q}`;
 
@@ -198,138 +193,136 @@
   }
 
   /* =========================================================
-     Marigolds & garlands
+     Mandala (line-art, like a printed card)
      ========================================================= */
-  function marigold(parent, x, y, r, alt) {
+  function ring(g, count, offset, d, attrs = {}) {
+    for (let i = 0; i < count; i++) {
+      el('path', { d, transform: `rotate(${(i * 360) / count + offset})`, ...attrs }, g);
+    }
+  }
+  function dots(g, count, r, size, color) {
+    for (let i = 0; i < count; i++) {
+      const a = (i / count) * Math.PI * 2;
+      el('circle', { cx: (Math.sin(a) * r).toFixed(2), cy: (-Math.cos(a) * r).toFixed(2), r: size, fill: color, stroke: 'none' }, g);
+    }
+  }
+  function buildMandala(svg) {
+    const color = svg.dataset.color || '#255543';
+    const simple = svg.dataset.simple === '1';
+    const g = el('g', { fill: 'none', stroke: color, 'stroke-width': 0.9, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, svg);
+    el('circle', { r: 5, fill: color, stroke: 'none' }, g);
+    ring(g, 8, 0, 'M0 -6 C5 -10 5 -15 0 -19 C-5 -15 -5 -10 0 -6 Z');
+    el('circle', { r: 21 }, g);
+    el('circle', { r: 24 }, g);
+    ring(g, 16, 0, 'M0 -24 C6 -28 7 -34 0 -41 C-7 -34 -6 -28 0 -24 Z');
+    ring(g, 16, 0, 'M0 -28 V-37', { 'stroke-width': 0.6 });
+    dots(g, 36, 44.5, 1.3, color);
+    el('circle', { r: 48 }, g);
+    ring(g, 12, 0, 'M0 -48 C14 -54 16 -68 0 -80 C-16 -68 -14 -54 0 -48 Z');
+    ring(g, 12, 0, 'M0 -53 C8 -58 9 -66 0 -73 C-9 -66 -8 -58 0 -53 Z', { 'stroke-width': 0.7 });
+    ring(g, 12, 15, 'M0 -52 C3.5 -56 3.5 -61 0 -65 C-3.5 -61 -3.5 -56 0 -52 Z');
+    const dg = el('g', { fill: color, stroke: 'none' }, g);
+    ring(dg, 12, 0, 'M0 -60 a1.8 1.8 0 1 0 .1 0 Z');
+    el('circle', { r: 82 }, g);
+    ring(g, 24, 0, 'M-10.7 -81.3 Q0 -97 10.7 -81.3');
+    dots(g, 24, 87, 1.2, color);
+    if (!simple) {
+      el('circle', { r: 95, 'stroke-width': 0.6 }, g);
+      el('circle', { r: 98 }, g);
+      ring(g, 32, 0, 'M0 -98 C3.4 -102 3.4 -107 0 -113 C-3.4 -107 -3.4 -102 0 -98 Z');
+      dots(g, 48, 117, 1, color);
+      ring(g, 16, 11.25, 'M0 -120 c4 -2 7 -6 4 -9.5 c-3 -2.4 -6.4 .8 -4.4 3.4');
+      el('circle', { r: 127, 'stroke-width': 0.6, 'stroke-dasharray': '2 3' }, g);
+    }
+  }
+
+  /* =========================================================
+     Garlands (jasmine & rose strands, mango leaves, lights)
+     ========================================================= */
+  function jasmine(parent, x, y, r) {
     const g = el('g', {}, parent);
-    el('circle', { cx: x, cy: y, r, fill: alt ? 'url(#gMarigold2)' : 'url(#gMarigold)' }, g);
-    el('circle', {
-      cx: x, cy: y, r: r * 0.78, fill: 'none',
-      stroke: alt ? '#c07a14' : '#a9530f', 'stroke-width': r * 0.22,
-      'stroke-dasharray': `${r * 0.28} ${r * 0.32}`, opacity: 0.55,
-    }, g);
-    el('circle', { cx: x - r * 0.25, cy: y - r * 0.3, r: r * 0.28, fill: '#fff3c4', opacity: 0.35 }, g);
+    el('circle', { cx: x, cy: y, r, fill: 'url(#gJasmine)', stroke: '#bcd9cf', 'stroke-width': 0.5 }, g);
+    el('circle', { cx: x, cy: y, r: r * 0.62, fill: 'none', stroke: '#d7ebe4', 'stroke-width': r * 0.25, 'stroke-dasharray': `${r * 0.3} ${r * 0.35}` }, g);
+    el('circle', { cx: x, cy: y, r: r * 0.22, fill: '#e9d27d' }, g);
     return g;
   }
-
-  function jasmine(parent, x, y, r) {
-    el('circle', { cx: x, cy: y, r, fill: '#fffaf0', stroke: '#e7dcc6', 'stroke-width': 0.6 }, parent);
-    el('circle', { cx: x, cy: y, r: r * 0.35, fill: '#f1d58c' }, parent);
+  function rose(parent, x, y, r) {
+    const g = el('g', {}, parent);
+    el('circle', { cx: x, cy: y, r, fill: 'url(#gRose)' }, g);
+    el('path', { d: `M${x - r * 0.4} ${y} a${r * 0.45} ${r * 0.45} 0 1 1 ${r * 0.45} ${r * 0.45}`, fill: 'none', stroke: '#b4505f', 'stroke-width': 0.6 }, g);
+    return g;
   }
-
   function bell(parent, x, y, s = 1) {
     const g = el('g', { transform: `translate(${x} ${y}) scale(${s})` }, parent);
-    el('path', { d: 'M0 0 V4', stroke: '#9a7432', 'stroke-width': 1 }, g);
-    el('path', { d: 'M-6 14 C-6 6 -3 4 0 4 C3 4 6 6 6 14 Z', fill: 'url(#gGold)', stroke: '#8a6220', 'stroke-width': 0.6 }, g);
-    el('circle', { cx: 0, cy: 15.5, r: 1.8, fill: '#8a6220' }, g);
+    el('path', { d: 'M0 0 V4', stroke: '#9a7b3d', 'stroke-width': 1 }, g);
+    el('path', { d: 'M-6 14 C-6 6 -3 4 0 4 C3 4 6 6 6 14 Z', fill: 'url(#gGold)', stroke: '#8a6a32', 'stroke-width': 0.6 }, g);
+    el('circle', { cx: 0, cy: 15.5, r: 1.8, fill: '#8a6a32' }, g);
     return g;
   }
-
   function leaf(parent, x, y, angle, len, color) {
     const g = el('g', { transform: `translate(${x} ${y}) rotate(${angle})` }, parent);
     el('path', { d: `M0 0 C${-len * 0.28} ${len * 0.3} ${-len * 0.18} ${len * 0.75} 0 ${len} C${len * 0.18} ${len * 0.75} ${len * 0.28} ${len * 0.3} 0 0 Z`, fill: color }, g);
-    el('path', { d: `M0 1 V${len - 2}`, stroke: '#3f5232', 'stroke-width': 0.6, opacity: 0.6 }, g);
+    el('path', { d: `M0 1 V${len - 2}`, stroke: '#24452f', 'stroke-width': 0.6, opacity: 0.5 }, g);
     return g;
   }
-
   function strand(parent, x, y0, len, opts = {}) {
     const g = el('g', { class: 'strand' }, parent);
     g.style.animationDuration = `${rand(3.6, 5.6).toFixed(2)}s`;
     g.style.animationDelay = `${(-rand(0, 5)).toFixed(2)}s`;
-    const r = opts.r || 5.2;
-    el('path', { d: `M${x} ${y0} V${y0 + len}`, stroke: '#7a5a1e', 'stroke-width': 0.6 }, g);
+    const r = opts.r || 4.6;
+    el('path', { d: `M${x} ${y0} V${y0 + len}`, stroke: '#5e8d6b', 'stroke-width': 0.6 }, g);
     let i = 0;
-    for (let y = y0 + r; y < y0 + len; y += r * 1.62, i++) {
-      if (opts.jasmine && i % 6 === 5) jasmine(g, x, y, r * 0.62);
-      else marigold(g, x, y, r, i % 2 === 1);
+    for (let y = y0 + r; y < y0 + len; y += r * 1.55, i++) {
+      if (i % 7 === 6) rose(g, x, y, r * 1.05);
+      else jasmine(g, x, y, r);
     }
-    leaf(g, x, y0 + len, -28, 11, '#5d7348');
-    leaf(g, x, y0 + len, 28, 11, '#6f8a57');
+    leaf(g, x, y0 + len, -28, 11, '#4f8a5e');
+    leaf(g, x, y0 + len, 28, 11, '#6fa36f');
     if (opts.bell !== false) bell(g, x, y0 + len + 2, opts.bellScale || 0.9);
     return g;
   }
-
-  function swag(parent, x1, x2, y, dip, r = 4.6) {
+  function swag(parent, x1, x2, y, dip, r = 4.4) {
     const g = el('g', {}, parent);
-    const n = Math.round((x2 - x1) / (r * 1.55));
+    const n = Math.round((x2 - x1) / (r * 1.5));
     for (let i = 0; i <= n; i++) {
       const t = i / n;
       const x = x1 + (x2 - x1) * t;
       const yy = y + dip * 4 * t * (1 - t);
-      marigold(g, x, yy, r, i % 2 === 0);
+      if (i % 5 === 2) rose(g, x, yy, r * 1.05);
+      else jasmine(g, x, yy, r);
     }
     return g;
   }
-
-  function lights(parent, x1, x2, y, dip, count, warm = '#ffd98a') {
+  function lights(parent, x1, x2, y, dip, count, warm = '#ffe6a3') {
     const g = el('g', {}, parent);
-    el('path', { d: `M${x1} ${y} Q${(x1 + x2) / 2} ${y + dip * 2} ${x2} ${y}`, fill: 'none', stroke: '#6b4a2a', 'stroke-width': 0.5, opacity: 0.7 }, g);
+    el('path', { d: `M${x1} ${y} Q${(x1 + x2) / 2} ${y + dip * 2} ${x2} ${y}`, fill: 'none', stroke: '#5e8d6b', 'stroke-width': 0.5, opacity: 0.6 }, g);
     for (let i = 1; i < count; i++) {
       const t = i / count;
       const x = x1 + (x2 - x1) * t;
       const yy = y + dip * 4 * t * (1 - t);
       const b = el('circle', { cx: x, cy: yy + 2, r: 1.7, fill: warm, class: 'bulb' }, g);
       b.style.animationDelay = `${(-rand(0, 2.4)).toFixed(2)}s`;
-      b.style.filter = 'drop-shadow(0 0 2px rgba(255,200,110,.9))';
+      b.style.filter = 'drop-shadow(0 0 2px rgba(255,214,120,.95))';
     }
     return g;
   }
-
   function buildToran() {
     const svg = $('#toran');
     if (!svg) return;
-    // fairy lights behind
-    lights(svg, 0, 400, 22, 60, 26);
-    lights(svg, 0, 400, 30, 90, 30, '#fff1c8');
-    // side strands (long, like a pandal entrance)
-    strand(svg, 14, 8, 250, { jasmine: true });
-    strand(svg, 36, 8, 196, { jasmine: true, r: 4.6 });
-    strand(svg, 58, 8, 142, { r: 4.2, bellScale: 0.75 });
-    strand(svg, 386, 8, 250, { jasmine: true });
-    strand(svg, 364, 8, 196, { jasmine: true, r: 4.6 });
-    strand(svg, 342, 8, 142, { r: 4.2, bellScale: 0.75 });
-    // centre drop
-    strand(svg, 200, 40, 44, { r: 4.4, bellScale: 1.1 });
-    // swags
-    swag(svg, 0, 200, 8, 32, 5);
-    swag(svg, 200, 400, 8, 32, 5);
-    // mango leaves along the top
+    lights(svg, 0, 400, 20, 50, 26);
+    strand(svg, 14, 8, 210, {});
+    strand(svg, 34, 8, 160, { r: 4.2 });
+    strand(svg, 54, 8, 110, { r: 3.8, bellScale: 0.75 });
+    strand(svg, 386, 8, 210, {});
+    strand(svg, 366, 8, 160, { r: 4.2 });
+    strand(svg, 346, 8, 110, { r: 3.8, bellScale: 0.75 });
+    swag(svg, 0, 200, 8, 26, 4.6);
+    swag(svg, 200, 400, 8, 26, 4.6);
+    bell(svg, 200, 12, 1.1);
     for (let x = 4; x <= 400; x += 13) {
-      leaf(svg, x, 0, rand(-10, 10), rand(16, 22), (x / 13) % 2 < 1 ? '#5d7348' : '#738f59');
+      leaf(svg, x, 0, rand(-10, 10), rand(15, 21), (x / 13) % 2 < 1 ? '#3f7d58' : '#5f9c6a');
     }
-    el('rect', { x: 0, y: 0, width: 400, height: 3, fill: '#7a5a1e' }, svg);
-  }
-
-  /* =========================================================
-     Alpana (rotating floor art behind the title)
-     ========================================================= */
-  function buildAlpana() {
-    const svg = $('#alpana');
-    if (!svg) return;
-    const g = el('g', { fill: 'none', stroke: '#f1dca2', 'stroke-width': 1.2, 'stroke-linecap': 'round' }, svg);
-    el('circle', { r: 34 }, g);
-    el('circle', { r: 150, 'stroke-dasharray': '1 6', 'stroke-width': 2 }, g);
-    el('circle', { r: 104 }, g);
-    for (let i = 0; i < 8; i++) {
-      const rg = el('g', { transform: `rotate(${i * 45})` }, g);
-      el('path', { d: 'M0 -36 C22 -52 20 -82 0 -100 C-20 -82 -22 -52 0 -36 Z' }, rg);
-      el('path', { d: 'M0 -46 C10 -56 10 -76 0 -88 C-10 -76 -10 -56 0 -46 Z' }, rg);
-      el('path', { d: 'M0 -100 C6 -108 4 -116 -2 -116 C-6 -116 -6 -110 -2 -109' }, rg);
-    }
-    for (let i = 0; i < 16; i++) {
-      const rg = el('g', { transform: `rotate(${i * 22.5 + 11.25})` }, g);
-      el('path', { d: 'M0 -106 C7 -112 7 -122 0 -130 C-7 -122 -7 -112 0 -106 Z' }, rg);
-      el('circle', { cy: -138, r: 2.2, fill: '#f1dca2', stroke: 'none' }, rg);
-    }
-    for (let i = 0; i < 24; i++) {
-      const rg = el('g', { transform: `rotate(${i * 15})` }, g);
-      el('path', { d: 'M0 -144 c6 -3 10 -9 5 -13 c-4 -3 -9 0 -6 4' }, rg);
-    }
-    for (let i = 0; i < 8; i++) {
-      const rg = el('g', { transform: `rotate(${i * 45 + 22.5})` }, g);
-      el('path', { d: 'M0 -12 C5 -18 5 -26 0 -32 C-5 -26 -5 -18 0 -12 Z', fill: 'rgba(241,220,162,.25)' }, rg);
-    }
-    el('circle', { r: 6, fill: '#f1dca2', stroke: 'none' }, g);
+    el('rect', { x: 0, y: 0, width: 400, height: 3, fill: '#5e8d6b' }, svg);
   }
 
   /* =========================================================
@@ -350,14 +343,13 @@
       const t = (x - 150) / 100;
       return 138 - 10 * Math.sin(Math.PI * t);
     };
-    const C = '#4b1219';
+    const C = '#1f4f43';
 
-    // traffic (drawn first so the lattice sits in front of it)
     const traffic = el('g', {}, g);
     const vehicles = [
       { type: 'taxi', dur: 13, delay: -2 }, { type: 'taxi', dur: 13, delay: -7.5 },
       { type: 'bus', dur: 18, delay: -11 }, { type: 'taxi', dur: 15, delay: -4, rev: true },
-      { type: 'tram', dur: 24, delay: -14, rev: true }, { type: 'taxi', dur: 15, delay: -11, rev: true },
+      { type: 'tram', dur: 24, delay: -14, rev: true },
     ];
     vehicles.forEach((v) => {
       const vg = el('g', { class: `veh${v.rev ? ' rev' : ''}` }, traffic);
@@ -367,21 +359,18 @@
       if (v.type === 'taxi') {
         el('rect', { x: 0, y: y - 5, width: 11, height: 5, rx: 1.6, fill: '#e3b23c' }, vg);
         el('rect', { x: 2.5, y: y - 8, width: 6, height: 3.4, rx: 1.2, fill: '#e3b23c' }, vg);
-        el('rect', { x: 3.4, y: y - 7.3, width: 4.2, height: 2, fill: '#6b5a3a', opacity: 0.6 }, vg);
       } else if (v.type === 'bus') {
-        el('rect', { x: 0, y: y - 8, width: 20, height: 8, rx: 1.6, fill: '#2f5d74' }, vg);
-        el('path', { d: `M2 ${y - 6} h16`, stroke: '#f6e7d2', 'stroke-width': 1.6, 'stroke-dasharray': '2.4 1.4' }, vg);
+        el('rect', { x: 0, y: y - 8, width: 20, height: 8, rx: 1.6, fill: '#d06d84' }, vg);
+        el('path', { d: `M2 ${y - 6} h16`, stroke: '#fffaf0', 'stroke-width': 1.6, 'stroke-dasharray': '2.4 1.4' }, vg);
       } else {
-        el('rect', { x: 0, y: y - 9, width: 26, height: 8, rx: 1.2, fill: '#3e6f9a' }, vg);
-        el('rect', { x: 0, y: y - 4, width: 26, height: 3, fill: '#f6e7d2' }, vg);
-        el('path', { d: `M3 ${y - 7.4} h20`, stroke: '#f6e7d2', 'stroke-width': 1.8, 'stroke-dasharray': '3 1.6' }, vg);
-        el('path', { d: `M13 ${y - 9} l-3 -5 h6`, stroke: '#3d0a12', 'stroke-width': 0.6, fill: 'none' }, vg);
+        el('rect', { x: 0, y: y - 9, width: 26, height: 8, rx: 1.2, fill: '#649fb9' }, vg);
+        el('rect', { x: 0, y: y - 4, width: 26, height: 3, fill: '#fffaf0' }, vg);
+        el('path', { d: `M13 ${y - 9} l-3 -5 h6`, stroke: '#1f4f43', 'stroke-width': 0.6, fill: 'none' }, vg);
       }
-      el('circle', { cx: 3, cy: y, r: 1.3, fill: '#2a060c' }, vg);
-      el('circle', { cx: v.type === 'taxi' ? 8 : v.type === 'bus' ? 16 : 22, cy: y, r: 1.3, fill: '#2a060c' }, vg);
+      el('circle', { cx: 3, cy: y, r: 1.3, fill: '#143a31' }, vg);
+      el('circle', { cx: v.type === 'taxi' ? 8 : v.type === 'bus' ? 16 : 22, cy: y, r: 1.3, fill: '#143a31' }, vg);
     });
 
-    // lattice
     let d = '';
     const step = 10;
     for (let x = 0; x <= 400; x += step) {
@@ -389,19 +378,14 @@
       const x2 = x + step;
       const y2 = topY(Math.min(x2, 400));
       d += `M${x} ${DECK} L${x} ${y1.toFixed(1)} `;
-      if (x < 400) {
-        d += `M${x} ${DECK} L${x2} ${y2.toFixed(1)} M${x} ${y1.toFixed(1)} L${x2} ${DECK} `;
-      }
+      if (x < 400) d += `M${x} ${DECK} L${x2} ${y2.toFixed(1)} M${x} ${y1.toFixed(1)} L${x2} ${DECK} `;
     }
-    el('path', { d, stroke: C, 'stroke-width': 0.85, fill: 'none', opacity: 0.88 }, g);
-
+    el('path', { d, stroke: C, 'stroke-width': 0.9, fill: 'none', opacity: 0.85 }, g);
     let chord = '';
     for (let x = 0; x <= 400; x += 2) chord += `${x === 0 ? 'M' : 'L'}${x} ${topY(x).toFixed(1)} `;
-    el('path', { d: chord, stroke: C, 'stroke-width': 3.2, fill: 'none', 'stroke-linejoin': 'round' }, g);
+    el('path', { d: chord, stroke: C, 'stroke-width': 3.4, fill: 'none', 'stroke-linejoin': 'round' }, g);
     el('rect', { x: 0, y: DECK - 2, width: 400, height: 6, fill: C }, g);
     el('path', { d: `M0 ${DECK + 7} H400`, stroke: C, 'stroke-width': 1.4 }, g);
-
-    // towers
     [70, 330].forEach((tx) => {
       const tg = el('g', {}, g);
       el('path', { d: `M${tx - 7} ${TOWER - 4} L${tx - 7} 238 M${tx + 7} ${TOWER - 4} L${tx + 7} 238`, stroke: C, 'stroke-width': 3 }, tg);
@@ -410,66 +394,11 @@
       el('path', { d: x, stroke: C, 'stroke-width': 0.9 }, tg);
       el('rect', { x: tx - 11, y: TOWER - 9, width: 22, height: 6, fill: C }, tg);
       el('rect', { x: tx - 12, y: 228, width: 24, height: 16, fill: C }, tg);
-      el('circle', { cx: tx, cy: TOWER - 12, r: 1.8, fill: '#ff5a4f', class: 'bulb' }, tg);
     });
-
-    // evening lights along the top chord
     const lg = el('g', {}, g);
     for (let x = 8; x < 400; x += 16) {
-      const b = el('circle', { cx: x, cy: topY(x) - 1, r: 1.25, fill: '#ffe2a0', class: 'bulb' }, lg);
+      const b = el('circle', { cx: x, cy: topY(x) - 1, r: 1.6, fill: '#ffe2a0', class: 'bulb' }, lg);
       b.style.animationDelay = `${(-rand(0, 2.4)).toFixed(2)}s`;
-    }
-  }
-
-  /* =========================================================
-     Couple scene extras (lights, strands, balusters)
-     ========================================================= */
-  function buildCoupleExtras() {
-    const lg = $('#cpLights');
-    if (lg) {
-      lights(lg, 20, 340, 84, 34, 24);
-      lights(lg, 20, 340, 110, 30, 22, '#fff1c8');
-    }
-    const sg = $('#cpStrands');
-    if (sg) {
-      strand(sg, 40, 100, 210, { r: 5, jasmine: true });
-      strand(sg, 64, 70, 140, { r: 4.4, bellScale: 0.8 });
-      strand(sg, 296, 70, 140, { r: 4.4, bellScale: 0.8 });
-      strand(sg, 320, 100, 210, { r: 5, jasmine: true });
-    }
-    const bal = $('#balusters');
-    if (bal) {
-      for (let x = 12; x < 360; x += 22) {
-        el('path', { d: `M${x - 3} 348 C${x - 10} 360 ${x - 10} 376 ${x - 3} 386 L${x - 4} 400 H${x + 4} L${x + 3} 386 C${x + 10} 376 ${x + 10} 360 ${x + 3} 348 Z` }, bal);
-        el('rect', { x: x - 6, y: 398, width: 12, height: 6 }, bal);
-      }
-    }
-    const dt = $('#doorToran');
-    if (dt) {
-      for (let x = 62; x <= 168; x += 9) leaf(dt, x, 70, rand(-8, 8), 14, x % 18 ? '#5d7348' : '#738f59');
-      swag(dt, 56, 174, 68, 9, 4);
-    }
-  }
-
-  /* =========================================================
-     Alta footsteps
-     ========================================================= */
-  function buildFootsteps() {
-    const wrap = $('#footsteps');
-    if (!wrap) return;
-    const n = 7;
-    for (let i = 0; i < n; i++) {
-      const left = i % 2 === 0;
-      const svg = el('svg', { viewBox: '0 0 40 76', class: 'fp' });
-      el('use', { href: '#foot' }, svg);
-      const y = 300 - 46 - i * 40;
-      const x = 120 + (left ? -30 : 6);
-      svg.style.left = `${x}px`;
-      svg.style.top = `${y}px`;
-      svg.style.setProperty('--i', i);
-      svg.style.setProperty('--sx', left ? -1 : 1);
-      svg.style.setProperty('--r', `${left ? 6 : -6}deg`);
-      wrap.appendChild(svg);
     }
   }
 
@@ -483,18 +412,18 @@
     let visible = true;
     function init() {
       if (!host || reduceMotion) return;
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < 4; i++) {
         const d = document.createElement('div');
         d.className = 'bfly';
-        d.innerHTML = '<svg viewBox="-30 -24 60 48"><use href="#butterfly"/></svg>';
+        d.innerHTML = '<svg viewBox="-30 -24 60 48"><use href="#butterfly" x="-30" y="-24" width="60" height="48"/></svg>';
         host.appendChild(d);
         list.push({
           el: d,
-          ax: rand(0.25, 0.4), ay: rand(0.12, 0.2),
+          ax: rand(0.25, 0.4), ay: rand(0.12, 0.22),
           fx: rand(0.00011, 0.00018), fy: rand(0.00023, 0.00034),
           px: rand(0, 6.28), py: rand(0, 6.28),
-          cx: rand(0.3, 0.7), cy: rand(0.35, 0.65),
-          s: rand(0.75, 1.1), lx: 0, ly: 0,
+          cx: rand(0.3, 0.7), cy: rand(0.3, 0.7),
+          s: rand(0.75, 1.15), lx: 0, ly: 0,
         });
       }
       new IntersectionObserver((e) => {
@@ -520,15 +449,15 @@
   })();
 
   /* =========================================================
-     Falling petals canvas
+     Falling petals canvas (jasmine, rose, leaves, sparkles)
      ========================================================= */
   const Petals = (() => {
     const c = $('#petals');
     const ctx = c && c.getContext('2d');
     const COLORS = [
-      ['#e39a2a', '#f7c95a'], ['#d9821f', '#f2b34a'],
-      ['#a3202b', '#c94a52'], ['#8a1823', '#b43a44'],
-      ['#fffaf0', '#efe3cc'], ['#eebb3f', '#fbe08a'],
+      ['#ffffff', '#e3f3ee'], ['#fdfdf8', '#dcefe8'],
+      ['#e9a3ae', '#f7d0d6'], ['#d77d91', '#f0b5c0'],
+      ['#7fbf9f', '#b9e3cf'], ['#e6d39d', '#fff3cc'],
     ];
     let W = 0; let H = 0; let list = []; let running = false;
     function resize() {
@@ -542,7 +471,7 @@
       return {
         x: rand(0, W),
         y: burst ? rand(-H * 0.7, -10) : rand(-H, H),
-        size: spark ? rand(1.2, 2.4) : rand(5, 10),
+        size: spark ? rand(1.2, 2.4) : rand(5, 9.5),
         vy: burst ? rand(1.1, 2.2) : rand(0.35, 0.85),
         vx: rand(-0.25, 0.25),
         rot: rand(0, 6.28), vr: rand(-0.025, 0.025),
@@ -556,26 +485,28 @@
       ctx.translate(p.x, p.y);
       ctx.rotate(p.rot);
       if (p.spark) {
-        const a = 0.5 + 0.5 * Math.sin(p.flip * 3);
-        ctx.globalAlpha = a;
-        ctx.fillStyle = '#ffe9b0';
-        ctx.beginPath();
+        ctx.globalAlpha = 0.5 + 0.5 * Math.sin(p.flip * 3);
+        ctx.fillStyle = '#e6c56a';
         const s = p.size;
+        ctx.beginPath();
         ctx.moveTo(0, -s * 2.4); ctx.lineTo(s * 0.5, -s * 0.5); ctx.lineTo(s * 2.4, 0); ctx.lineTo(s * 0.5, s * 0.5);
         ctx.lineTo(0, s * 2.4); ctx.lineTo(-s * 0.5, s * 0.5); ctx.lineTo(-s * 2.4, 0); ctx.lineTo(-s * 0.5, -s * 0.5);
         ctx.closePath(); ctx.fill();
       } else {
         ctx.scale(1, 0.25 + 0.75 * Math.abs(Math.cos(p.flip)));
         const s = p.size;
-        ctx.globalAlpha = 0.92;
+        ctx.globalAlpha = 0.95;
         ctx.fillStyle = p.col[0];
+        ctx.shadowColor = 'rgba(37,85,67,.25)';
+        ctx.shadowBlur = 2;
         ctx.beginPath();
         ctx.moveTo(0, -s);
         ctx.bezierCurveTo(s * 0.9, -s * 0.7, s * 0.7, s * 0.6, 0, s);
         ctx.bezierCurveTo(-s * 0.7, s * 0.6, -s * 0.9, -s * 0.7, 0, -s);
         ctx.fill();
+        ctx.shadowBlur = 0;
         ctx.fillStyle = p.col[1];
-        ctx.globalAlpha = 0.55;
+        ctx.globalAlpha = 0.6;
         ctx.beginPath();
         ctx.ellipse(-s * 0.15, -s * 0.2, s * 0.22, s * 0.5, 0, 0, 6.283);
         ctx.fill();
@@ -590,7 +521,6 @@
         p.sway += p.swaySp; p.flip += p.flipSp; p.rot += p.vr;
         p.x += p.vx + Math.sin(p.sway) * 0.6;
         p.y += p.vy;
-        if (p.burst && p.vy > 0.9) p.vy *= 0.996;
         if (p.y > H + 20 || p.x < -30 || p.x > W + 30) {
           if (p.burst) { list.splice(i, 1); continue; }
           Object.assign(p, make(false), { y: -20 });
@@ -608,7 +538,7 @@
       requestAnimationFrame(loop);
       window.addEventListener('resize', resize);
     }
-    function burst(n = 70) {
+    function burst(n = 50) {
       if (!running) return;
       for (let i = 0; i < n; i++) list.push(make(true));
     }
@@ -629,28 +559,25 @@
       btn.setAttribute('aria-pressed', String(on));
       btn.querySelector('use').setAttribute('href', on ? '#i-music' : '#i-mute');
     }
-
     function ksBuffer(freq, seconds) {
       const sr = ctx.sampleRate;
       const len = Math.floor(sr * seconds);
       const buf = ctx.createBuffer(1, len, sr);
       const out = buf.getChannelData(0);
       const N = Math.max(2, Math.round(sr / freq));
-      const ring = new Float32Array(N);
-      for (let i = 0; i < N; i++) ring[i] = Math.random() * 2 - 1;
+      const ringBuf = new Float32Array(N);
+      for (let i = 0; i < N; i++) ringBuf[i] = Math.random() * 2 - 1;
       let idx = 0;
       for (let i = 0; i < len; i++) {
-        const a = ring[idx];
-        const b = ring[(idx + 1) % N];
+        const a = ringBuf[idx];
+        const b = ringBuf[(idx + 1) % N];
         out[i] = a;
-        ring[idx] = (a + b) * 0.5 * 0.9985;
+        ringBuf[idx] = (a + b) * 0.5 * 0.9985;
         idx = (idx + 1) % N;
       }
-      // gentle attack to soften the pluck
       for (let i = 0; i < 300 && i < len; i++) out[i] *= i / 300;
       return buf;
     }
-
     function ensureCtx() {
       if (ctx) return true;
       const AC = window.AudioContext || window.webkitAudioContext;
@@ -666,11 +593,10 @@
       master.connect(lp);
       lp.connect(ctx.destination);
       lp.connect(delay); delay.connect(fb); fb.connect(delay); delay.connect(ctx.destination);
-      const SA = 277.18; // C#4
+      const SA = 277.18;
       buffers = [SA * 0.75, SA, SA, SA / 2].map((f) => ksBuffer(f, 5));
       return true;
     }
-
     function pluck(when) {
       const src = ctx.createBufferSource();
       src.buffer = buffers[step % buffers.length];
@@ -680,7 +606,6 @@
       src.start(when);
       step++;
     }
-
     function chime() {
       if (!ensureCtx()) return;
       if (ctx.state === 'suspended') ctx.resume();
@@ -697,7 +622,6 @@
         o.start(t); o.stop(t + 3.4);
       });
     }
-
     function startDrone() {
       if (!ensureCtx()) return;
       if (ctx.state === 'suspended') ctx.resume();
@@ -710,7 +634,6 @@
       timer = setInterval(() => pluck(ctx.currentTime + 0.05), 1150);
       setUI(true);
     }
-
     function stopDrone() {
       clearInterval(timer);
       if (ctx) {
@@ -719,36 +642,28 @@
         master.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.8);
       }
     }
-
     function start() {
       if (!audio.getAttribute('src')) audio.setAttribute('src', CONFIG.musicFile);
       audio.volume = 0.6;
       const p = audio.play();
-      if (p && p.then) {
-        p.then(() => { mode = 'file'; setUI(true); }).catch(() => startDrone());
-      } else {
-        startDrone();
-      }
+      if (p && p.then) p.then(() => { mode = 'file'; setUI(true); }).catch(() => startDrone());
+      else startDrone();
     }
-
     function stop() {
       if (mode === 'file') audio.pause();
       else stopDrone();
       setUI(false);
     }
-
     btn.addEventListener('click', () => (playing ? stop() : start()));
     return { start, chime };
   })();
 
   /* =========================================================
-     Envelope
+     Gatefold intro
      ========================================================= */
-  function initEnvelope() {
-    const env = $('#envelope');
+  function initGate() {
+    const gate = $('#gate');
     const seal = $('#seal');
-    const svg = $('.seal-svg', seal);
-    $$('.seal-half', seal).forEach((h) => h.appendChild(svg.cloneNode(true)));
 
     // personalised greeting: ?to=Name
     const params = new URLSearchParams(location.search);
@@ -765,21 +680,21 @@
     const open = () => {
       if (opened) return;
       opened = true;
-      env.classList.add('opening');
+      gate.classList.add('opening');
       // start audio inside the tap itself so mobile browsers allow it
       Music.chime();
       Music.start();
       setTimeout(() => {
         document.body.classList.remove('is-sealed');
         document.body.classList.add('is-open');
-        env.classList.add('opened');
         Petals.start();
         Petals.burst(50);
         revealVisible();
-      }, reduceMotion ? 200 : 2300);
-      setTimeout(() => env.remove(), reduceMotion ? 400 : 3400);
+      }, reduceMotion ? 100 : 1300);
+      setTimeout(() => gate.classList.add('opened'), reduceMotion ? 150 : 1900);
+      setTimeout(() => gate.remove(), reduceMotion ? 400 : 2800);
     };
-    env.addEventListener('click', open);
+    gate.addEventListener('click', open);
     seal.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
     if (params.has('open')) open();
   }
@@ -806,7 +721,7 @@
     const pauseObs = new IntersectionObserver((entries) => {
       entries.forEach((e) => e.target.classList.toggle('is-off', !e.isIntersecting));
     }, { rootMargin: '80px' });
-    $$('.scene, .couple-svg, .toran, .steps-scene').forEach((n) => pauseObs.observe(n));
+    $$('.scene, .couple-svg, .couple-bg, .toran').forEach((n) => pauseObs.observe(n));
   }
   function revealVisible() {
     const vh = window.innerHeight;
@@ -834,6 +749,20 @@
       v.load();
       const p = v.play();
       if (p && p.catch) p.catch(() => {});
+    }).catch(() => {});
+  }
+
+  /* =========================================================
+     Optional painted couple image (assets/images/couple.png)
+     ========================================================= */
+  function initCouplePhoto() {
+    const img = $('#couplePhoto');
+    if (!img || location.protocol === 'file:') return;
+    const src = img.dataset.src;
+    fetch(src, { method: 'HEAD' }).then((r) => {
+      if (!r.ok) return;
+      img.onload = () => { img.hidden = false; };
+      img.src = src;
     }).catch(() => {});
   }
 
@@ -871,19 +800,18 @@
   function boot() {
     const params = new URLSearchParams(location.search);
     renderFamily();
+    $$('.mandala-src').forEach(buildMandala);
     buildToran();
-    buildAlpana();
     buildBridge();
-    buildCoupleExtras();
-    buildFootsteps();
     setLang(params.get('lang') || store.get('wc-lang') || 'bn');
     $('#langBtn').addEventListener('click', () => setLang(lang === 'bn' ? 'en' : 'bn'));
     tickCountdown();
     setInterval(tickCountdown, 1000);
     initReveal();
-    initEnvelope();
+    initGate();
     initShare();
     initHeroVideo();
+    initCouplePhoto();
     Butterflies.init();
   }
 
