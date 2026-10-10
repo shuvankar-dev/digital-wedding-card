@@ -12,9 +12,19 @@
     // the calendar entry all read from here.
     mapQuery: 'Odhanpur, Deganga, North 24 Parganas, West Bengal 743423',
     venue: 'Bride\'s residence, Vill. Odhanpur, P.O. Sohai Kumarpur, P.S. Deganga, North 24 Parganas, PIN 743423',
-    // Optional background music. Drop an mp3 at this path (e.g. a shehnai
-    // track) and it plays instead of the built-in tanpura drone.
-    musicFile: 'assets/audio/music.mp3',
+    // Background song "Rote Gachey Khobor" in two moods, cut from the song:
+    // 0:10–0:20 plays on the closed card, 0:53–1:15 once it is opened. Each
+    // part loops, blending its end into its start over `blend` seconds, so
+    // every file is its part plus `blend` seconds of tail.
+    music: {
+      envelope: 'assets/audio/khobor-envelope.mp3',
+      main: 'assets/audio/khobor-main.mp3',
+      blend: 1.2,
+      volume: 0.85,
+    },
+    // Optional short looping clip (for example an AI-animated version of the
+    // opening painting) played over the painting. Leave empty for none.
+    heroVideo: '',
     weddingStart: '2026-12-12T00:00:00+05:30',
     events: {
       wedding: {
@@ -25,47 +35,26 @@
     },
   };
 
+  // the পরিচিতি cards show the bride and groom with their parents
   const FAMILY = {
     bride: {
       bn: [
         ['পিতা', 'শ্রী তিলক কুমার পাল'],
         ['মাতা', 'শ্রীমতী কাকলী পাল'],
-        ['ভাই', 'শুভজিৎ পাল'],
-        ['ঠাকুরদা', 'ঈশ্বর ভরত চন্দ্র পাল'],
-        ['ঠাকুমা', 'ঈশ্বর সন্ধ্যা রানী পাল'],
-        ['নিবাস', 'গ্রাম - ওধানপুর, পোঃ - সোহাই কুমারপুর, পুঃ স্টেঃ - দেগঙ্গা, উত্তর ২৪ পরগনা, পিন - ৭৪৩৪২৩'],
       ],
       en: [
         ['Father', 'Mr. Tilak Kumar Pal'],
         ['Mother', 'Mrs. Kakali Pal'],
-        ['Brother', 'Shubhajit Pal'],
-        ['Grandfather', 'Late Bharat Chandra Pal'],
-        ['Grandmother', 'Late Sandhya Rani Pal'],
-        ['Residence', 'Vill. Odhanpur, P.O. Sohai Kumarpur, P.S. Deganga, North 24 Parganas, PIN 743423'],
       ],
     },
     groom: {
       bn: [
         ['পিতা', 'শ্রী সুশান্ত দাস'],
         ['মাতা', 'শ্রীমতী কল্পনা দাস'],
-        ['পিতামহ', 'ঈশ্বর শ্রী গৌরাঙ্গ চন্দ্র দাস'],
-        ['পিতামহী', 'ঈশ্বর শ্রীমতী আলোরানী দাস'],
-        ['জেঠু', 'শ্রীযুক্ত প্রশান্ত দাস'],
-        ['কাকু', 'শ্রীযুক্ত মিন্টু দাস'],
-        ['জেঠিমা', 'শ্রীমতী বিভা দাস'],
-        ['কাকিমা', 'শ্রীমতী অর্পণা দাস'],
-        ['নিবাস', 'কৃষ্ণপুর, হানাপাড়া, কলকাতা - ৭০০১০২'],
       ],
       en: [
         ['Father', 'Mr. Sushanta Das'],
         ['Mother', 'Mrs. Kalpana Das'],
-        ['Grandfather', 'Late Gouranga Chandra Das'],
-        ['Grandmother', 'Late Alorani Das'],
-        ['Uncle (Jethu)', 'Mr. Prashanta Das'],
-        ['Uncle (Kaku)', 'Mr. Mintu Das'],
-        ['Aunt (Jethima)', 'Mrs. Viva Das'],
-        ['Aunt (Kakima)', 'Mrs. Arpana Das'],
-        ['Residence', 'Krishnapur, Hanapara, Kolkata - 700102'],
       ],
     },
   };
@@ -124,12 +113,11 @@
     $$('.pc-list').forEach((dl) => {
       const data = FAMILY[dl.dataset.list];
       ['bn', 'en'].forEach((l) => {
-        data[l].forEach(([k, v], i) => {
-          const isAddr = i === data[l].length - 1;
+        data[l].forEach(([k, v]) => {
           const dt = document.createElement('dt');
           const dd = document.createElement('dd');
-          dt.className = l + (isAddr ? ' addr-label' : '');
-          dd.className = l + (isAddr ? ' addr-value' : '');
+          dt.className = l;
+          dd.className = l;
           dt.textContent = k;
           dd.textContent = v;
           dl.append(dt, dd);
@@ -237,8 +225,17 @@
   }
 
   /* =========================================================
-     Garlands (jasmine & rose strands, mango leaves, lights)
+     Garlands (marigold strings, mango leaves, bells, lights)
      ========================================================= */
+  const ORANGE = ['#e46f17', '#ffa23a', '#a8470b'];
+  const YELLOW = ['#f0ac12', '#ffd34a', '#b97c06'];
+  function marigold(parent, x, y, r, tone) {
+    const g = el('g', {}, parent);
+    el('circle', { cx: x, cy: y, r, fill: tone[0] }, g);
+    el('circle', { cx: x, cy: y, r: r * 0.68, fill: 'none', stroke: tone[1], 'stroke-width': r * 0.5, 'stroke-dasharray': `${(r * 0.3).toFixed(2)} ${(r * 0.2).toFixed(2)}` }, g);
+    el('circle', { cx: x, cy: y, r: r * 0.24, fill: tone[2] }, g);
+    return g;
+  }
   function jasmine(parent, x, y, r) {
     const g = el('g', {}, parent);
     el('circle', { cx: x, cy: y, r, fill: 'url(#gJasmine)', stroke: '#bcd9cf', 'stroke-width': 0.5 }, g);
@@ -272,9 +269,9 @@
     const r = opts.r || 4.6;
     el('path', { d: `M${x} ${y0} V${y0 + len}`, stroke: '#5e8d6b', 'stroke-width': 0.6 }, g);
     let i = 0;
-    for (let y = y0 + r; y < y0 + len; y += r * 1.55, i++) {
-      if (i % 7 === 6) rose(g, x, y, r * 1.05);
-      else jasmine(g, x, y, r);
+    for (let y = y0 + r; y < y0 + len; y += r * 1.5, i++) {
+      if (i % 9 === 8) jasmine(g, x, y, r * 0.85);
+      else marigold(g, x, y, r, Math.floor(i / 4) % 2 ? YELLOW : ORANGE);
     }
     leaf(g, x, y0 + len, -28, 11, '#4f8a5e');
     leaf(g, x, y0 + len, 28, 11, '#6fa36f');
@@ -288,8 +285,8 @@
       const t = i / n;
       const x = x1 + (x2 - x1) * t;
       const yy = y + dip * 4 * t * (1 - t);
-      if (i % 5 === 2) rose(g, x, yy, r * 1.05);
-      else jasmine(g, x, yy, r);
+      if (i % 6 === 3) rose(g, x, yy, r);
+      else marigold(g, x, yy, r, i % 2 ? YELLOW : ORANGE);
     }
     return g;
   }
@@ -326,93 +323,15 @@
   }
 
   /* =========================================================
-     Howrah Bridge (lattice, lights, traffic)
-     ========================================================= */
-  function buildBridge() {
-    const g = $('#bridge');
-    if (!g) return;
-    const DECK = 192;
-    const TOWER = 62;
-    const topY = (x) => {
-      if (x > 200) return topY(400 - x);
-      if (x <= 70) return 172 + (TOWER - 172) * (x / 70);
-      if (x <= 150) {
-        const t = (x - 70) / 80;
-        return TOWER + (138 - TOWER) * (1 - Math.pow(1 - t, 1.7));
-      }
-      const t = (x - 150) / 100;
-      return 138 - 10 * Math.sin(Math.PI * t);
-    };
-    const C = '#1f4f43';
-
-    const traffic = el('g', {}, g);
-    const vehicles = [
-      { type: 'taxi', dur: 13, delay: -2 }, { type: 'taxi', dur: 13, delay: -7.5 },
-      { type: 'bus', dur: 18, delay: -11 }, { type: 'taxi', dur: 15, delay: -4, rev: true },
-      { type: 'tram', dur: 24, delay: -14, rev: true },
-    ];
-    vehicles.forEach((v) => {
-      const vg = el('g', { class: `veh${v.rev ? ' rev' : ''}` }, traffic);
-      vg.style.setProperty('--dur', `${v.dur}s`);
-      vg.style.setProperty('--delay', `${v.delay}s`);
-      const y = v.rev ? 185 : 182;
-      if (v.type === 'taxi') {
-        el('rect', { x: 0, y: y - 5, width: 11, height: 5, rx: 1.6, fill: '#e3b23c' }, vg);
-        el('rect', { x: 2.5, y: y - 8, width: 6, height: 3.4, rx: 1.2, fill: '#e3b23c' }, vg);
-      } else if (v.type === 'bus') {
-        el('rect', { x: 0, y: y - 8, width: 20, height: 8, rx: 1.6, fill: '#d06d84' }, vg);
-        el('path', { d: `M2 ${y - 6} h16`, stroke: '#fffaf0', 'stroke-width': 1.6, 'stroke-dasharray': '2.4 1.4' }, vg);
-      } else {
-        el('rect', { x: 0, y: y - 9, width: 26, height: 8, rx: 1.2, fill: '#649fb9' }, vg);
-        el('rect', { x: 0, y: y - 4, width: 26, height: 3, fill: '#fffaf0' }, vg);
-        el('path', { d: `M13 ${y - 9} l-3 -5 h6`, stroke: '#1f4f43', 'stroke-width': 0.6, fill: 'none' }, vg);
-      }
-      el('circle', { cx: 3, cy: y, r: 1.3, fill: '#143a31' }, vg);
-      el('circle', { cx: v.type === 'taxi' ? 8 : v.type === 'bus' ? 16 : 22, cy: y, r: 1.3, fill: '#143a31' }, vg);
-    });
-
-    let d = '';
-    const step = 10;
-    for (let x = 0; x <= 400; x += step) {
-      const y1 = topY(x);
-      const x2 = x + step;
-      const y2 = topY(Math.min(x2, 400));
-      d += `M${x} ${DECK} L${x} ${y1.toFixed(1)} `;
-      if (x < 400) d += `M${x} ${DECK} L${x2} ${y2.toFixed(1)} M${x} ${y1.toFixed(1)} L${x2} ${DECK} `;
-    }
-    el('path', { d, stroke: C, 'stroke-width': 0.9, fill: 'none', opacity: 0.85 }, g);
-    let chord = '';
-    for (let x = 0; x <= 400; x += 2) chord += `${x === 0 ? 'M' : 'L'}${x} ${topY(x).toFixed(1)} `;
-    el('path', { d: chord, stroke: C, 'stroke-width': 3.4, fill: 'none', 'stroke-linejoin': 'round' }, g);
-    el('rect', { x: 0, y: DECK - 2, width: 400, height: 6, fill: C }, g);
-    el('path', { d: `M0 ${DECK + 7} H400`, stroke: C, 'stroke-width': 1.4 }, g);
-    [70, 330].forEach((tx) => {
-      const tg = el('g', {}, g);
-      el('path', { d: `M${tx - 7} ${TOWER - 4} L${tx - 7} 238 M${tx + 7} ${TOWER - 4} L${tx + 7} 238`, stroke: C, 'stroke-width': 3 }, tg);
-      let x = '';
-      for (let y = TOWER; y < 232; y += 14) x += `M${tx - 7} ${y} L${tx + 7} ${y + 14} M${tx + 7} ${y} L${tx - 7} ${y + 14} `;
-      el('path', { d: x, stroke: C, 'stroke-width': 0.9 }, tg);
-      el('rect', { x: tx - 11, y: TOWER - 9, width: 22, height: 6, fill: C }, tg);
-      el('rect', { x: tx - 12, y: 228, width: 24, height: 16, fill: C }, tg);
-    });
-    const lg = el('g', {}, g);
-    for (let x = 8; x < 400; x += 16) {
-      const b = el('circle', { cx: x, cy: topY(x) - 1, r: 1.6, fill: '#ffe2a0', class: 'bulb' }, lg);
-      b.style.animationDelay = `${(-rand(0, 2.4)).toFixed(2)}s`;
-    }
-  }
-
-  /* =========================================================
-     Butterflies (প্রজাপতি) in the hero
+     Butterflies (প্রজাপতি) around the couple
      ========================================================= */
   const Butterflies = (() => {
-    const host = $('#butterflies');
-    const list = [];
-    let raf = 0;
-    let visible = true;
-    function init() {
-      if (!host || reduceMotion) return;
-      for (let i = 0; i < 4; i++) {
+    function fly(host) {
+      const list = [];
+      let raf = 0;
+      let visible = true;
+      const count = Number(host.dataset.count) || 4;
+      for (let i = 0; i < count; i++) {
         const d = document.createElement('div');
         d.className = 'bfly';
         d.innerHTML = '<svg viewBox="-30 -24 60 48"><use href="#butterfly" x="-30" y="-24" width="60" height="48"/></svg>';
@@ -426,91 +345,167 @@
           s: rand(0.75, 1.15), lx: 0, ly: 0,
         });
       }
+      function loop(t) {
+        if (!visible) { raf = 0; return; }
+        const W = host.clientWidth;
+        const H = host.clientHeight;
+        list.forEach((b) => {
+          const x = W * (b.cx + b.ax * Math.sin(t * b.fx + b.px));
+          const y = H * (b.cy + b.ay * Math.sin(t * b.fy + b.py)) + 8 * Math.sin(t * 0.004 + b.px);
+          const ang = Math.atan2(y - b.ly, x - b.lx) * 57.3 + 90;
+          b.lx = x; b.ly = y;
+          b.el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${(ang * 0.25).toFixed(1)}deg) scale(${b.s})`;
+        });
+        raf = requestAnimationFrame(loop);
+      }
       new IntersectionObserver((e) => {
         visible = e[0].isIntersecting;
         if (visible && !raf) raf = requestAnimationFrame(loop);
       }).observe(host);
-      raf = requestAnimationFrame(loop);
     }
-    function loop(t) {
-      if (!visible) { raf = 0; return; }
-      const W = host.clientWidth;
-      const H = host.clientHeight;
-      list.forEach((b) => {
-        const x = W * (b.cx + b.ax * Math.sin(t * b.fx + b.px));
-        const y = H * (b.cy + b.ay * Math.sin(t * b.fy + b.py)) + 8 * Math.sin(t * 0.004 + b.px);
-        const ang = Math.atan2(y - b.ly, x - b.lx) * 57.3 + 90;
-        b.lx = x; b.ly = y;
-        b.el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${(ang * 0.25).toFixed(1)}deg) scale(${b.s})`;
-      });
-      raf = requestAnimationFrame(loop);
+    function init() {
+      if (!reduceMotion) $$('.butterflies').forEach(fly);
     }
     return { init };
   })();
 
   /* =========================================================
-     Falling petals canvas (jasmine, rose, leaves, sparkles)
+     Falling flowers: rose petals, marigolds, jasmine, gold
      ========================================================= */
   const Petals = (() => {
     const c = $('#petals');
     const ctx = c && c.getContext('2d');
-    const COLORS = [
-      ['#ffffff', '#e3f3ee'], ['#fdfdf8', '#dcefe8'],
-      ['#e9a3ae', '#f7d0d6'], ['#d77d91', '#f0b5c0'],
-      ['#7fbf9f', '#b9e3cf'], ['#e6d39d', '#fff3cc'],
-    ];
-    let W = 0; let H = 0; let list = []; let running = false;
+    let W = 0; let H = 0; let dpr = 1;
+    let list = []; let running = false; let kinds = []; let total = 0;
+
+    // each flower is drawn once into a small canvas, then stamped every frame
+    function sprite(r, draw) {
+      const s = document.createElement('canvas');
+      s.width = s.height = Math.ceil(r * 2 * dpr);
+      const g = s.getContext('2d');
+      g.scale(dpr, dpr);
+      g.translate(r, r);
+      draw(g, r * 0.92);
+      return s;
+    }
+    function petal(g, r, deep, light) {
+      const gr = g.createRadialGradient(-r * 0.2, -r * 0.25, r * 0.08, 0, 0, r * 1.1);
+      gr.addColorStop(0, light);
+      gr.addColorStop(1, deep);
+      g.fillStyle = gr;
+      g.beginPath();
+      g.moveTo(0, r);
+      g.bezierCurveTo(-r * 1.05, r * 0.35, -r * 0.8, -r * 0.95, 0, -r * 0.62);
+      g.bezierCurveTo(r * 0.8, -r * 0.95, r * 1.05, r * 0.35, 0, r);
+      g.fill();
+      g.strokeStyle = 'rgba(255,255,255,.35)';
+      g.lineWidth = r * 0.07;
+      g.beginPath();
+      g.moveTo(0, r * 0.82);
+      g.quadraticCurveTo(-r * 0.12, 0, 0, -r * 0.42);
+      g.stroke();
+    }
+    function marigold(g, r, outer, inner) {
+      [[1, 16, outer], [0.74, 13, inner], [0.5, 9, outer]].forEach(([k, n, col], ring) => {
+        g.fillStyle = col;
+        for (let i = 0; i < n; i++) {
+          g.save();
+          g.rotate((i / n) * Math.PI * 2 + ring * 0.35);
+          g.beginPath();
+          g.ellipse(0, -r * k * 0.62, r * k * 0.26, r * k * 0.42, 0, 0, Math.PI * 2);
+          g.fill();
+          g.restore();
+        }
+      });
+      g.fillStyle = '#b5520f';
+      g.beginPath();
+      g.arc(0, 0, r * 0.15, 0, Math.PI * 2);
+      g.fill();
+    }
+    function jasmine(g, r) {
+      g.shadowColor = 'rgba(30,60,50,.25)';
+      g.shadowBlur = r * 0.3;
+      g.fillStyle = '#fffdf6';
+      for (let i = 0; i < 5; i++) {
+        g.save();
+        g.rotate((i / 5) * Math.PI * 2);
+        g.beginPath();
+        g.ellipse(0, -r * 0.55, r * 0.3, r * 0.5, 0, 0, Math.PI * 2);
+        g.fill();
+        g.restore();
+      }
+      g.shadowBlur = 0;
+      g.fillStyle = '#f3dd8a';
+      g.beginPath();
+      g.arc(0, 0, r * 0.15, 0, Math.PI * 2);
+      g.fill();
+    }
+    function star(g, r) {
+      const gr = g.createRadialGradient(0, 0, 0, 0, 0, r);
+      gr.addColorStop(0, 'rgba(255,248,220,1)');
+      gr.addColorStop(0.35, 'rgba(255,224,140,.9)');
+      gr.addColorStop(1, 'rgba(255,214,120,0)');
+      g.fillStyle = gr;
+      g.beginPath();
+      for (let i = 0; i < 8; i++) {
+        const a = (i / 8) * Math.PI * 2;
+        const rr = i % 2 ? r * 0.2 : r;
+        g.lineTo(Math.sin(a) * rr, -Math.cos(a) * rr);
+      }
+      g.closePath();
+      g.fill();
+    }
+    function build() {
+      kinds = [
+        { type: 'petal', size: 11, weight: 6, img: sprite(11, (g, r) => petal(g, r, '#c2183f', '#ff8aa3')) },
+        { type: 'petal', size: 11, weight: 5, img: sprite(11, (g, r) => petal(g, r, '#e23d5c', '#ffb8c6')) },
+        { type: 'petal', size: 10, weight: 4, img: sprite(10, (g, r) => petal(g, r, '#f07fa4', '#ffe0ea')) },
+        { type: 'petal', size: 9, weight: 4, img: sprite(9, (g, r) => petal(g, r, '#ea7a12', '#ffc670')) },
+        { type: 'flower', size: 10, weight: 3, img: sprite(10, (g, r) => marigold(g, r, '#ef7b10', '#ffb43a')) },
+        { type: 'flower', size: 10, weight: 3, img: sprite(10, (g, r) => marigold(g, r, '#f4ad0c', '#ffd859')) },
+        { type: 'flower', size: 10, weight: 3, img: sprite(10, (g, r) => jasmine(g, r)) },
+        { type: 'star', size: 7, weight: 3, img: sprite(7, (g, r) => star(g, r)) },
+      ];
+      total = kinds.reduce((s, k) => s + k.weight, 0);
+    }
+    function kind() {
+      let n = Math.random() * total;
+      for (const k of kinds) { n -= k.weight; if (n <= 0) return k; }
+      return kinds[0];
+    }
+    function make(opts = {}) {
+      const k = kind();
+      return {
+        k,
+        x: opts.x !== undefined ? opts.x : rand(-10, W + 10),
+        y: opts.y !== undefined ? opts.y : rand(-H, H),
+        vx: opts.vx !== undefined ? opts.vx : rand(-0.25, 0.25),
+        vy: opts.vy !== undefined ? opts.vy : rand(0.45, 1.05),
+        fall: rand(0.55, 1.25),
+        scale: rand(0.7, 1.2),
+        rot: rand(0, 6.28), vr: rand(-0.03, 0.03),
+        sway: rand(0, 6.28), swaySp: rand(0.01, 0.025),
+        flip: rand(0, 6.28), flipSp: rand(0.025, 0.06),
+        once: !!opts.once,
+      };
+    }
     function resize() {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
       W = c.clientWidth; H = c.clientHeight;
       c.width = W * dpr; c.height = H * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      build();
     }
-    function make(burst) {
-      const spark = Math.random() < 0.16;
-      return {
-        x: rand(0, W),
-        y: burst ? rand(-H * 0.7, -10) : rand(-H, H),
-        size: spark ? rand(1.2, 2.4) : rand(5, 9.5),
-        vy: burst ? rand(1.1, 2.2) : rand(0.35, 0.85),
-        vx: rand(-0.25, 0.25),
-        rot: rand(0, 6.28), vr: rand(-0.025, 0.025),
-        sway: rand(0, 6.28), swaySp: rand(0.008, 0.02),
-        flip: rand(0, 6.28), flipSp: rand(0.02, 0.05),
-        col: pick(COLORS), spark, burst,
-      };
-    }
-    function drawPetal(p) {
+    function draw(p) {
+      const k = p.k;
+      const s = k.size * 2 * p.scale;
       ctx.save();
       ctx.translate(p.x, p.y);
       ctx.rotate(p.rot);
-      if (p.spark) {
-        ctx.globalAlpha = 0.5 + 0.5 * Math.sin(p.flip * 3);
-        ctx.fillStyle = '#e6c56a';
-        const s = p.size;
-        ctx.beginPath();
-        ctx.moveTo(0, -s * 2.4); ctx.lineTo(s * 0.5, -s * 0.5); ctx.lineTo(s * 2.4, 0); ctx.lineTo(s * 0.5, s * 0.5);
-        ctx.lineTo(0, s * 2.4); ctx.lineTo(-s * 0.5, s * 0.5); ctx.lineTo(-s * 2.4, 0); ctx.lineTo(-s * 0.5, -s * 0.5);
-        ctx.closePath(); ctx.fill();
-      } else {
-        ctx.scale(1, 0.25 + 0.75 * Math.abs(Math.cos(p.flip)));
-        const s = p.size;
-        ctx.globalAlpha = 0.95;
-        ctx.fillStyle = p.col[0];
-        ctx.shadowColor = 'rgba(37,85,67,.25)';
-        ctx.shadowBlur = 2;
-        ctx.beginPath();
-        ctx.moveTo(0, -s);
-        ctx.bezierCurveTo(s * 0.9, -s * 0.7, s * 0.7, s * 0.6, 0, s);
-        ctx.bezierCurveTo(-s * 0.7, s * 0.6, -s * 0.9, -s * 0.7, 0, -s);
-        ctx.fill();
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = p.col[1];
-        ctx.globalAlpha = 0.6;
-        ctx.beginPath();
-        ctx.ellipse(-s * 0.15, -s * 0.2, s * 0.22, s * 0.5, 0, 0, 6.283);
-        ctx.fill();
-      }
+      if (k.type === 'petal') ctx.scale(1, 0.3 + 0.7 * Math.abs(Math.cos(p.flip)));
+      else if (k.type === 'flower') ctx.scale(1, 0.65 + 0.35 * Math.abs(Math.cos(p.flip)));
+      else ctx.globalAlpha = 0.35 + 0.65 * Math.abs(Math.sin(p.flip * 1.6));
+      ctx.drawImage(k.img, -s / 2, -s / 2, s, s);
       ctx.restore();
     }
     function loop() {
@@ -519,143 +514,230 @@
       for (let i = list.length - 1; i >= 0; i--) {
         const p = list[i];
         p.sway += p.swaySp; p.flip += p.flipSp; p.rot += p.vr;
-        p.x += p.vx + Math.sin(p.sway) * 0.6;
+        // thrown flowers slow down and settle into a gentle fall
+        p.vx = p.vx * 0.975 + Math.sin(p.sway) * 0.02;
+        p.vy += (p.fall - p.vy) * 0.03;
+        p.x += p.vx + Math.sin(p.sway) * 0.45;
         p.y += p.vy;
-        if (p.y > H + 20 || p.x < -30 || p.x > W + 30) {
-          if (p.burst) { list.splice(i, 1); continue; }
-          Object.assign(p, make(false), { y: -20 });
+        if (p.y > H + 30 || p.x < -40 || p.x > W + 40) {
+          if (p.once) { list.splice(i, 1); continue; }
+          Object.assign(p, make({ y: -30 }));
         }
-        drawPetal(p);
+        draw(p);
       }
       requestAnimationFrame(loop);
     }
     function start() {
       if (!c || reduceMotion || running) return;
       resize();
-      const n = Math.round(Math.min(18, Math.max(8, (W * H) / 36000)));
-      list = Array.from({ length: n }, () => make(false));
+      const n = Math.round(Math.min(26, Math.max(12, (W * H) / 20000)));
+      list = Array.from({ length: n }, () => make());
       running = true;
       requestAnimationFrame(loop);
       window.addEventListener('resize', resize);
     }
-    function burst(n = 50) {
+    // a shower of flowers thrown up and out from a point (the Ganesh seal)
+    function shower(x, y, n = 70) {
       if (!running) return;
-      for (let i = 0; i < n; i++) list.push(make(true));
+      for (let i = 0; i < n; i++) {
+        const a = rand(-Math.PI, 0) + rand(-0.35, 0.35);
+        const v = rand(3, 9.5);
+        list.push(make({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 1.5, once: true }));
+      }
+      // and a second wave drifting down from the top
+      for (let i = 0; i < n * 0.6; i++) list.push(make({ y: rand(-H * 0.6, -10), vy: rand(1.4, 2.4), once: true }));
     }
-    return { start, burst };
+    return { start, shower };
   })();
 
   /* =========================================================
-     Music: optional mp3, otherwise a soft synthesised tanpura
+     Gold sparkles twinkling over the opening scene
+     ========================================================= */
+  function sparkleLayer(canvas) {
+    const ctx = canvas.getContext('2d');
+    const count = Number(canvas.dataset.count) || 20;
+    const top = Number(canvas.dataset.top) || 0;
+    const bottom = Number(canvas.dataset.bottom) || 1;
+    let W = 0; let H = 0; let list = []; let raf = 0; let visible = false;
+    function resize() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = canvas.clientWidth; H = canvas.clientHeight;
+      canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    function make() {
+      return { x: rand(0, W), y: rand(H * top, H * bottom), r: rand(2.5, 6), ph: rand(0, 6.28), sp: rand(0.02, 0.05), vy: rand(0.03, 0.12) };
+    }
+    function frame() {
+      if (!visible) { raf = 0; return; }
+      ctx.clearRect(0, 0, W, H);
+      list.forEach((p) => {
+        p.ph += p.sp;
+        p.y += p.vy;
+        if (p.y > H * bottom) Object.assign(p, make(), { y: H * top });
+        const a = Math.max(0, Math.sin(p.ph));
+        if (a < 0.02) return;
+        const r = p.r * (0.5 + 0.5 * a);
+        ctx.globalAlpha = a;
+        const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 2.4);
+        g.addColorStop(0, 'rgba(255,246,214,.9)');
+        g.addColorStop(1, 'rgba(255,220,140,0)');
+        ctx.fillStyle = g;
+        ctx.fillRect(p.x - r * 2.4, p.y - r * 2.4, r * 4.8, r * 4.8);
+        ctx.fillStyle = '#fff8e0';
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y - r * 2); ctx.lineTo(p.x + r * 0.28, p.y - r * 0.28); ctx.lineTo(p.x + r * 2, p.y);
+        ctx.lineTo(p.x + r * 0.28, p.y + r * 0.28); ctx.lineTo(p.x, p.y + r * 2); ctx.lineTo(p.x - r * 0.28, p.y + r * 0.28);
+        ctx.lineTo(p.x - r * 2, p.y); ctx.lineTo(p.x - r * 0.28, p.y - r * 0.28);
+        ctx.closePath();
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+      raf = requestAnimationFrame(frame);
+    }
+    resize();
+    list = Array.from({ length: count }, make);
+    window.addEventListener('resize', resize);
+    new IntersectionObserver((e) => {
+      visible = e[0].isIntersecting;
+      if (visible && !raf) raf = requestAnimationFrame(frame);
+    }).observe(canvas);
+  }
+
+  /* =========================================================
+     Music: "Rote Gachey Khobor" — one mood on the closed card,
+     another once it opens; each part loops with a soft blend
      ========================================================= */
   const Music = (() => {
-    const btn = $('#musicBtn');
-    const audio = $('#bgm');
-    let ctx = null; let master = null; let timer = 0; let mode = null; let playing = false;
-    let buffers = null; let step = 0;
+    const M = CONFIG.music;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    const toggles = $$('.music-toggle');
+    let ctx = null; let out = null;
+    let mode = AC ? 'buffer' : 'element'; // <audio> fallback: file:// or no Web Audio
+    const buffers = {};
+    const els = {};
+    let scene = 'envelope'; // the mood that belongs on screen now
+    let on = true;          // the guest's choice (music buttons)
+    let voice = null;       // the loop that is sounding
+    let current = null;     // which mood `voice` is
 
-    function setUI(on) {
-      playing = on;
-      btn.setAttribute('aria-pressed', String(on));
-      btn.querySelector('use').setAttribute('href', on ? '#i-music' : '#i-mute');
-    }
-    function ksBuffer(freq, seconds) {
-      const sr = ctx.sampleRate;
-      const len = Math.floor(sr * seconds);
-      const buf = ctx.createBuffer(1, len, sr);
-      const out = buf.getChannelData(0);
-      const N = Math.max(2, Math.round(sr / freq));
-      const ringBuf = new Float32Array(N);
-      for (let i = 0; i < N; i++) ringBuf[i] = Math.random() * 2 - 1;
-      let idx = 0;
-      for (let i = 0; i < len; i++) {
-        const a = ringBuf[idx];
-        const b = ringBuf[(idx + 1) % N];
-        out[i] = a;
-        ringBuf[idx] = (a + b) * 0.5 * 0.9985;
-        idx = (idx + 1) % N;
-      }
-      for (let i = 0; i < 300 && i < len; i++) out[i] *= i / 300;
-      return buf;
-    }
-    function ensureCtx() {
-      if (ctx) return true;
-      const AC = window.AudioContext || window.webkitAudioContext;
-      if (!AC) return false;
-      ctx = new AC();
-      master = ctx.createGain();
-      master.gain.value = 0;
-      const lp = ctx.createBiquadFilter();
-      lp.type = 'lowpass'; lp.frequency.value = 2600;
-      const delay = ctx.createDelay(1);
-      delay.delayTime.value = 0.23;
-      const fb = ctx.createGain(); fb.gain.value = 0.32;
-      master.connect(lp);
-      lp.connect(ctx.destination);
-      lp.connect(delay); delay.connect(fb); fb.connect(delay); delay.connect(ctx.destination);
-      const SA = 277.18;
-      buffers = [SA * 0.75, SA, SA, SA / 2].map((f) => ksBuffer(f, 5));
-      return true;
-    }
-    function pluck(when) {
-      const src = ctx.createBufferSource();
-      src.buffer = buffers[step % buffers.length];
-      const g = ctx.createGain();
-      g.gain.value = step % 4 === 3 ? 0.55 : 0.4;
-      src.connect(g); g.connect(master);
-      src.start(when);
-      step++;
-    }
-    function chime() {
-      if (!ensureCtx()) return;
-      if (ctx.state === 'suspended') ctx.resume();
-      const t = ctx.currentTime + 0.02;
-      [[1, 0.16], [2.76, 0.07], [5.4, 0.035]].forEach(([mul, amp]) => {
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.type = 'sine';
-        o.frequency.value = 880 * mul;
-        g.gain.setValueAtTime(0, t);
-        g.gain.linearRampToValueAtTime(amp, t + 0.01);
-        g.gain.exponentialRampToValueAtTime(0.0001, t + 2.6 / mul + 0.6);
-        o.connect(g); g.connect(ctx.destination);
-        o.start(t); o.stop(t + 3.4);
+    function setUI(playing) {
+      toggles.forEach((b) => {
+        b.setAttribute('aria-pressed', String(playing));
+        b.querySelector('use').setAttribute('href', playing ? '#i-music' : '#i-mute');
       });
     }
-    function startDrone() {
-      if (!ensureCtx()) return;
-      if (ctx.state === 'suspended') ctx.resume();
-      mode = 'drone';
-      master.gain.cancelScheduledValues(ctx.currentTime);
-      master.gain.setValueAtTime(master.gain.value, ctx.currentTime);
-      master.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 2);
-      pluck(ctx.currentTime + 0.05);
-      clearInterval(timer);
-      timer = setInterval(() => pluck(ctx.currentTime + 0.05), 1150);
-      setUI(true);
-    }
-    function stopDrone() {
-      clearInterval(timer);
-      if (ctx) {
-        master.gain.cancelScheduledValues(ctx.currentTime);
-        master.gain.setValueAtTime(master.gain.value, ctx.currentTime);
-        master.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.8);
+
+    // Every repeat starts `blend` seconds before the last one ends and the two
+    // cross-fade, so the loop point is a soft blend rather than a cut.
+    function bufferLoop(buf, fadeIn) {
+      const g = ctx.createGain();
+      g.connect(out);
+      const t0 = ctx.currentTime;
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.linearRampToValueAtTime(1, t0 + fadeIn);
+      const step = Math.max(1, buf.duration - M.blend);
+      const live = new Set();
+      let next = t0 + 0.03;
+      function schedule() {
+        while (next < ctx.currentTime + 3) {
+          const s = ctx.createBufferSource();
+          const sg = ctx.createGain();
+          s.buffer = buf;
+          s.connect(sg);
+          sg.connect(g);
+          sg.gain.setValueAtTime(0, next);
+          sg.gain.linearRampToValueAtTime(1, next + M.blend);
+          sg.gain.setValueAtTime(1, next + step);
+          sg.gain.linearRampToValueAtTime(0, next + buf.duration);
+          s.start(next);
+          s.stop(next + buf.duration + 0.05);
+          live.add(s);
+          s.onended = () => live.delete(s);
+          next += step;
+        }
       }
+      schedule();
+      const timer = setInterval(schedule, 700);
+      return {
+        stop(fadeOut) {
+          clearInterval(timer);
+          const t = ctx.currentTime;
+          g.gain.cancelScheduledValues(t);
+          g.gain.setValueAtTime(g.gain.value, t);
+          g.gain.linearRampToValueAtTime(0.0001, t + fadeOut);
+          live.forEach((s) => { try { s.stop(t + fadeOut + 0.05); } catch (e) { /* already ended */ } });
+        },
+      };
     }
-    function start() {
-      if (!audio.getAttribute('src')) audio.setAttribute('src', CONFIG.musicFile);
-      audio.volume = 0.6;
-      const p = audio.play();
-      if (p && p.then) p.then(() => { mode = 'file'; setUI(true); }).catch(() => startDrone());
-      else startDrone();
+
+    function elementLoop(name) {
+      const a = els[name] || (els[name] = new Audio(M[name]));
+      a.loop = true;
+      a.volume = M.volume;
+      a.currentTime = 0;
+      const v = { stop() { a.pause(); } };
+      const p = a.play();
+      if (p && p.catch) p.catch(() => { if (voice === v) { voice = null; current = null; setUI(false); document.body.dataset.music = 'off'; } });
+      return v;
     }
-    function stop() {
-      if (mode === 'file') audio.pause();
-      else stopDrone();
-      setUI(false);
+
+    // Bring what is sounding in line with the scene, the guest's choice
+    // and tab visibility.
+    function sync(fade = 1.4) {
+      const want = on && !document.hidden ? scene : null;
+      if (want === current) return;
+      if (want) {
+        if (mode === 'buffer' && (!buffers[want] || ctx.state !== 'running')) return; // decoding, or waiting for a tap
+      }
+      if (voice) voice.stop(want ? fade : 0.7);
+      voice = null;
+      current = want;
+      if (want) voice = mode === 'buffer' ? bufferLoop(buffers[want], fade) : elementLoop(want);
+      setUI(!!voice);
+      document.body.dataset.music = current || 'off';
     }
-    btn.addEventListener('click', () => (playing ? stop() : start()));
-    return { start, chime };
+
+    // must run inside a tap: browsers only start sound after one
+    function wake() {
+      if (ctx && ctx.state !== 'running') ctx.resume().then(() => sync(), () => {});
+      sync();
+    }
+
+    function cue(name) { scene = name; wake(); }
+
+    function init() {
+      if (AC) {
+        ctx = new AC();
+        out = ctx.createGain();
+        out.gain.value = M.volume;
+        out.connect(ctx.destination);
+        ctx.onstatechange = () => sync();
+        // let iPhones play it even with the ring/silent switch on silent
+        if (navigator.audioSession) { try { navigator.audioSession.type = 'playback'; } catch (e) { /* older Safari */ } }
+        ['envelope', 'main'].forEach((name) => {
+          fetch(M[name])
+            .then((r) => { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
+            .then((data) => new Promise((res, rej) => ctx.decodeAudioData(data, res, rej)))
+            .then((buf) => { buffers[name] = buf; sync(); })
+            .catch(() => { mode = 'element'; current = null; sync(); });
+        });
+      }
+      // the first tap anywhere starts the mood on screen (the seal, its hint
+      // and the music buttons handle it themselves)
+      const onTap = (e) => { if (!(e.target.closest && e.target.closest('#seal, .gate-hint, .music-toggle'))) wake(); };
+      ['click', 'touchend', 'keydown'].forEach((ev) => document.addEventListener(ev, onTap, true));
+      toggles.forEach((b) => b.addEventListener('click', () => {
+        on = !voice;
+        if (on) wake(); else sync();
+      }));
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && ctx && ctx.state !== 'running') ctx.resume().then(() => sync(), () => {});
+        sync();
+      });
+      sync(); // plays right away where the browser allows sound without a tap
+    }
+    return { init, cue };
   })();
 
   /* =========================================================
@@ -681,21 +763,32 @@
       if (opened) return;
       opened = true;
       gate.classList.add('opening');
-      // start audio inside the tap itself so mobile browsers allow it
-      Music.chime();
-      Music.start();
+      // switch to the second mood inside the tap itself so phones allow it
+      Music.cue('main');
+      // a shower of flowers bursts from the seal, in front of the opening doors
+      const petals = $('#petals');
+      petals.classList.add('front');
+      Petals.start();
+      const r = seal.getBoundingClientRect();
+      Petals.shower(r.left + r.width / 2, r.top + r.height / 2, 70);
+      setTimeout(() => petals.classList.remove('front'), reduceMotion ? 0 : 3200);
       setTimeout(() => {
         document.body.classList.remove('is-sealed');
         document.body.classList.add('is-open');
-        Petals.start();
-        Petals.burst(50);
         revealVisible();
       }, reduceMotion ? 100 : 1300);
       setTimeout(() => gate.classList.add('opened'), reduceMotion ? 150 : 1900);
       setTimeout(() => gate.remove(), reduceMotion ? 400 : 2800);
     };
-    gate.addEventListener('click', open);
-    seal.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+    seal.addEventListener('click', open);
+    $('.gate-hint').addEventListener('click', open);
+    // a tap anywhere else starts the music; nudge the seal to show where to tap
+    gate.addEventListener('click', (e) => {
+      if (opened || e.target.closest('#seal, .gate-hint, .music-toggle')) return;
+      seal.classList.remove('nudge');
+      void seal.offsetWidth;
+      seal.classList.add('nudge');
+    });
     if (params.has('open')) open();
   }
 
@@ -721,7 +814,7 @@
     const pauseObs = new IntersectionObserver((entries) => {
       entries.forEach((e) => e.target.classList.toggle('is-off', !e.isIntersecting));
     }, { rootMargin: '80px' });
-    $$('.scene, .couple-svg, .couple-bg, .toran').forEach((n) => pauseObs.observe(n));
+    $$('.film, .info, .couple-bg, .portrait-frame').forEach((n) => pauseObs.observe(n));
   }
   function revealVisible() {
     const vh = window.innerHeight;
@@ -739,31 +832,13 @@
      ========================================================= */
   function initHeroVideo() {
     const v = $('#heroVideo');
-    const s = v && $('source', v);
-    if (!s || location.protocol === 'file:') return;
-    const src = s.dataset.src;
-    fetch(src, { method: 'HEAD' }).then((r) => {
-      if (!r.ok) return;
-      s.src = src;
-      v.hidden = false;
-      v.load();
-      const p = v.play();
-      if (p && p.catch) p.catch(() => {});
-    }).catch(() => {});
-  }
-
-  /* =========================================================
-     Optional painted couple image (assets/images/couple.png)
-     ========================================================= */
-  function initCouplePhoto() {
-    const img = $('#couplePhoto');
-    if (!img || location.protocol === 'file:') return;
-    const src = img.dataset.src;
-    fetch(src, { method: 'HEAD' }).then((r) => {
-      if (!r.ok) return;
-      img.onload = () => { img.hidden = false; };
-      img.src = src;
-    }).catch(() => {});
+    if (!v || !CONFIG.heroVideo || reduceMotion) return;
+    $('source', v).src = CONFIG.heroVideo;
+    v.addEventListener('playing', () => v.classList.add('on'), { once: true });
+    v.hidden = false;
+    v.load();
+    const p = v.play();
+    if (p && p.catch) p.catch(() => {});
   }
 
   /* =========================================================
@@ -802,16 +877,16 @@
     renderFamily();
     $$('.mandala-src').forEach(buildMandala);
     buildToran();
-    buildBridge();
     setLang(params.get('lang') || store.get('wc-lang') || 'bn');
     $('#langBtn').addEventListener('click', () => setLang(lang === 'bn' ? 'en' : 'bn'));
     tickCountdown();
     setInterval(tickCountdown, 1000);
     initReveal();
+    Music.init();
     initGate();
     initShare();
     initHeroVideo();
-    initCouplePhoto();
+    if (!reduceMotion) $$('.glow-fx').forEach(sparkleLayer);
     Butterflies.init();
   }
 
