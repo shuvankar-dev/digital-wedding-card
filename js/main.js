@@ -6,7 +6,7 @@
 
   /* ---------- editable details ---------- */
   const CONFIG = {
-    phone: '918101300532',
+    phone: '919800212595',
     // Replace with the exact location (a place name, an address, or
     // "lat,lng") once it is confirmed — the map, the directions button and
     // the calendar entry all read from here.

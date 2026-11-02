@@ -19,7 +19,7 @@ runs anywhere that serves files, including GitHub Pages.
 | নিমন্ত্রণ | The invitation letter from the bride's parents, under a Ganesh line drawing. |
 | পরিচিতি | The bride and the groom, each with their father and mother. |
 | শুভ লগ্ন | The wedding date card with "add to calendar", then the venue address, a Google Map and a directions button. |
-| যোগাযোগ | WhatsApp, call and share buttons for +91 81013 00532, and the sign-off. |
+| যোগাযোগ | WhatsApp, call and share buttons for +91 98002 12595, and the sign-off. |
 
 Rose petals, marigolds, jasmine and gold sparkles keep falling gently over the
 whole card once it is open. A floating bar at the bottom switches between বাংলা
