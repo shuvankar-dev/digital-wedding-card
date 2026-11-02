@@ -110,30 +110,30 @@
      Family lists
      ========================================================= */
   function renderFamily() {
-    $$('.pc-list').forEach((dl) => {
+    $$('.pc-parents').forEach((dl) => {
       const data = FAMILY[dl.dataset.list];
       ['bn', 'en'].forEach((l) => {
         data[l].forEach(([k, v]) => {
+          const box = document.createElement('div');
+          box.className = `pc-parent ${l}`;
           const dt = document.createElement('dt');
           const dd = document.createElement('dd');
-          dt.className = l;
-          dd.className = l;
           dt.textContent = k;
           dd.textContent = v;
-          dl.append(dt, dd);
+          box.append(dt, dd);
+          dl.append(box);
         });
       });
     });
   }
+
 
   /* =========================================================
      Links: map, directions, WhatsApp, calendar
      ========================================================= */
   function updateLinks() {
     const q = encodeURIComponent(CONFIG.mapQuery);
-    const frame = $('#mapFrame');
-    const src = `https://maps.google.com/maps?q=${q}&z=14&output=embed`;
-    if (frame.getAttribute('src') !== src) frame.setAttribute('src', src);
+    $('#mapLink').href = `https://www.google.com/maps/search/?api=1&query=${q}`;
     $('#dirBtn').href = `https://www.google.com/maps/dir/?api=1&destination=${q}`;
 
     const wa = `https://wa.me/${CONFIG.phone}?text=${encodeURIComponent(TEXT.wa[lang])}`;
@@ -678,7 +678,7 @@
       a.currentTime = 0;
       const v = { stop() { a.pause(); } };
       const p = a.play();
-      if (p && p.catch) p.catch(() => { if (voice === v) { voice = null; current = null; setUI(false); document.body.dataset.music = 'off'; } });
+      if (p && p.catch) p.catch(() => { if (voice === v) { voice = null; current = null; document.body.dataset.music = 'off'; } });
       return v;
     }
 
@@ -694,7 +694,7 @@
       voice = null;
       current = want;
       if (want) voice = mode === 'buffer' ? bufferLoop(buffers[want], fade) : elementLoop(want);
-      setUI(!!voice);
+      setUI(on);
       document.body.dataset.music = current || 'off';
     }
 
@@ -727,14 +727,19 @@
       // and the music buttons handle it themselves)
       const onTap = (e) => { if (!(e.target.closest && e.target.closest('#seal, .gate-hint, .music-toggle'))) wake(); };
       ['click', 'touchend', 'keydown'].forEach((ev) => document.addEventListener(ev, onTap, true));
+      // music is on by default; a tap on the button before any sound starts it,
+      // otherwise the button switches it off and on
       toggles.forEach((b) => b.addEventListener('click', () => {
-        on = !voice;
+        if (on && !voice) { wake(); return; }
+        on = !on;
+        setUI(on);
         if (on) wake(); else sync();
       }));
       document.addEventListener('visibilitychange', () => {
         if (!document.hidden && ctx && ctx.state !== 'running') ctx.resume().then(() => sync(), () => {});
         sync();
       });
+      setUI(on);
       sync(); // plays right away where the browser allows sound without a tap
     }
     return { init, cue };
