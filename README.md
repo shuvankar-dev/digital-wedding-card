@@ -63,14 +63,14 @@ All the editable details are at the top of `js/main.js` in `CONFIG`:
 | --- | --- |
 | `assets/images/hero.webp` | The opening scene (1200×2100). Built from the "Elegant" portrait, set low on a soft teal backdrop painted from its own background, so the title has room above the couple. |
 | `assets/images/couple.webp` | The শুভদৃষ্টি portrait (2:3), from the "Vibrant" portrait. |
-| `assets/images/og.jpg` | The preview image WhatsApp and Facebook show when the link is shared (1200×630). |
+| `assets/images/wedding-preview.jpg` | The preview image WhatsApp and Facebook show when the link is shared (1200×630). |
+| `assets/images/hand-tap.webp` | The hand that taps Ganesha on the closed card and shows guests to swipe up on the first page. |
 
 To use a different picture, replace the file and keep its name. For the opening
-scene, keep empty space in the top third for the title. The `og:image` tag in
-`index.html` points to
-`https://shuvankar-dev.github.io/digital-wedding-card/assets/images/og.jpg`;
-change it if the card is published somewhere else, because link previews need
-the full address.
+scene, keep empty space in the top third for the title. The preview tags at the top of
+`index.html` point to `https://prity-wedding-card.vercel.app`;
+change them if the card is published somewhere else, because link previews need
+the full address, and keep them first in `<head>`.
 
 **Optional animated opening:** an animated clip of the opening portrait (for
 example made from `hero.webp` with an image-to-video tool) can play over it.

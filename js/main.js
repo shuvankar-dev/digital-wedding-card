@@ -794,6 +794,13 @@
       void seal.offsetWidth;
       seal.classList.add('nudge');
     });
+    // the swipe guide stays until the guest actually scrolls
+    const swipe = $('#swipe');
+    const hideSwipe = () => swipe.classList.add('gone');
+    swipe.addEventListener('click', hideSwipe);
+    addEventListener('scroll', () => {
+      if (window.scrollY > 50 && document.body.classList.contains('is-open')) hideSwipe();
+    }, { passive: true });
     if (params.has('open')) open();
   }
 

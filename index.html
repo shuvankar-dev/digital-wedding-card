@@ -2,17 +2,26 @@
 <html lang="bn">
 <head>
   <meta charset="utf-8">
+  <!-- WhatsApp / Facebook preview. Keep this first in <head>: link previews only read the start of a page.
+       These must be full web addresses. If the site address changes, update every https://prity-wedding-card.vercel.app below. -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://prity-wedding-card.vercel.app/">
+  <meta property="og:site_name" content="শুভ বিবাহ · প্রীতি ও শুভঙ্কর">
+  <meta property="og:title" content="শুভ বিবাহ · প্রীতি ও শুভঙ্কর">
+  <meta property="og:description" content="১২ই ডিসেম্বর, ২০২৬ · ওধানপুর, দেগঙ্গা — আপনি সাদরে আমন্ত্রিত।">
+  <meta property="og:image" content="https://prity-wedding-card.vercel.app/assets/images/wedding-preview.jpg">
+  <meta property="og:image:secure_url" content="https://prity-wedding-card.vercel.app/assets/images/wedding-preview.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="প্রীতি ও শুভঙ্করের শুভ বিবাহের নিমন্ত্রণপত্র">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://prity-wedding-card.vercel.app/assets/images/wedding-preview.jpg">
+  <link rel="canonical" href="https://prity-wedding-card.vercel.app/">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>শুভ বিবাহ · প্রীতি ও শুভঙ্কর</title>
   <meta name="description" content="প্রীতি ও শুভঙ্করের শুভবিবাহ — ২৫শে অগ্রহায়ণ, ১৪৩৩ (ইং ১২ই ডিসেম্বর, ২০২৬) শনিবার, পাত্রীর বাসভবন, ওধানপুর, দেগঙ্গা।">
   <meta name="theme-color" content="#255543">
-  <meta property="og:title" content="শুভ বিবাহ · প্রীতি ও শুভঙ্কর">
-  <meta property="og:description" content="১২ই ডিসেম্বর, ২০২৬ · ওধানপুর, দেগঙ্গা — আপনি সাদরে আমন্ত্রিত।">
-  <meta property="og:type" content="website">
-  <meta property="og:image" content="https://shuvankar-dev.github.io/digital-wedding-card/assets/images/og.jpg">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="preload" as="image" href="assets/images/hero.webp" fetchpriority="high">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -229,6 +238,11 @@
       <svg viewBox="-60 -60 120 120" class="seal-svg" aria-hidden="true"><use href="#medal" x="-60" y="-60" width="120" height="120"/></svg>
     </button>
 
+    <div class="tap-guide" aria-hidden="true">
+      <i class="tg-ring"></i><i class="tg-ring b"></i><span class="tg-spark"><b style="--a:0deg"></b><b style="--a:60deg"></b><b style="--a:120deg"></b><b style="--a:180deg"></b><b style="--a:240deg"></b><b style="--a:300deg"></b></span>
+      <img class="tg-hand" src="assets/images/hand-tap.webp" alt="" decoding="async">
+    </div>
+
     <div class="gate-foot">
       <p class="gate-guest" id="guestLine" hidden></p>
       <p class="gate-hint"><span class="bn">খুলতে গণেশ চিহ্নে ছুঁয়ে দিন</span><span class="en">Tap Ganesha to open</span></p>
@@ -397,7 +411,7 @@
       </div>
 
       <article class="person-card groom-card reveal">
-        <span class="pc-ribbon pc-ribbon-alt"><span class="bn">আমাদের জামাতা</span><span class="en">Our Son-in-law</span></span>
+        <span class="pc-ribbon pc-ribbon-alt"><span class="bn">আমাদের জামাই</span><span class="en">Our Son-in-law</span></span>
         <div class="pc-frame"><img class="pc-photo" src="assets/images/groom.webp" alt="পাত্র শুভঙ্কর / The groom, Shubhankar" width="600" height="750" loading="lazy" decoding="async"></div>
         <p class="pc-role"><span class="bn">পাত্র</span><span class="en">Groom</span></p>
         <h3 class="pc-name"><span class="bn">কল্যাণীয় শুভঙ্কর</span><span class="en">Shubhankar</span></h3>
@@ -536,6 +550,14 @@
   </div>
 
   <!-- ============ DOCK ============ -->
+  <a id="swipe" href="#info" aria-label="নিচে দেখুন / Scroll down">
+    <span class="sw-stage" aria-hidden="true"><span class="sw-move"><i class="sw-touch"></i><img src="assets/images/hand-tap.webp" alt="" decoding="async"></span></span>
+    <span class="sw-pill"><svg class="sw-c" viewBox="0 0 16 18" aria-hidden="true"><path d="M2 9l6-6 6 6M2 16l6-6 6 6"/></svg>
+      <span class="touch"><span class="bn">উপরে স্ক্রোল করুন</span><span class="en">Swipe up</span></span>
+      <span class="mouse"><span class="bn">নিচে স্ক্রোল করুন</span><span class="en">Scroll down</span></span>
+      <svg class="sw-c" viewBox="0 0 16 18" aria-hidden="true"><path d="M2 9l6-6 6 6M2 16l6-6 6 6"/></svg></span>
+  </a>
+
   <nav class="dock" id="dock" aria-label="দ্রুত লিংক">
     <button type="button" class="dock-btn" id="langBtn" aria-label="Switch language / ভাষা বদলান"><b class="lang-glyph"><span class="bn">EN</span><span class="en">বাং</span></b></button>
     <button type="button" class="dock-btn music-toggle" id="musicBtn" aria-label="সংগীত চালু / বন্ধ · Music on / off" aria-pressed="false"><svg class="i"><use href="#i-mute"/></svg></button>

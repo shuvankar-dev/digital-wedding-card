@@ -1115,3 +1115,91 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--gold); outline-
   .film-head > *, .film-foot { opacity: 1; animation: none !important; }
   .heart-line { stroke-dashoffset: 0; }
 }
+
+/* =========================================================
+   HAND GUIDES — tap Ganesha, then swipe up
+   ========================================================= */
+
+/* closed card: the hand glides in, taps the seal twice, then withdraws */
+.tap-guide { position: absolute; left: 50%; top: 50%; width: 0; height: 0; z-index: 7; pointer-events: none; transition: opacity .25s ease; }
+.gate.opening .tap-guide { opacity: 0; }
+.tg-hand {
+  position: absolute; left: -26px; top: -2px; width: 132px; height: auto; max-width: none; transform-origin: 26px 2px;
+  transform: translate(8px, 18px); filter: drop-shadow(0 12px 14px rgba(10, 40, 34, .5));
+  animation: tgHand 3.8s cubic-bezier(.45, .05, .3, 1) infinite;
+}
+@keyframes tgHand {
+  0% { transform: translate(92px, 140px); opacity: 0; }
+  14% { transform: translate(18px, 42px); opacity: 1; }
+  24% { transform: translate(14px, 32px); }
+  31%, 36% { transform: translate(0, 0) scale(.95); }
+  44% { transform: translate(12px, 28px); }
+  51%, 56% { transform: translate(0, 0) scale(.95); }
+  68% { transform: translate(16px, 36px); opacity: 1; }
+  82%, 100% { transform: translate(92px, 140px); opacity: 0; }
+}
+.tg-ring {
+  position: absolute; left: -85px; top: -85px; width: 170px; height: 170px; border-radius: 50%; border: 2px solid #f3e2b0; opacity: 0;
+  box-shadow: 0 0 16px rgba(243, 226, 176, .85), inset 0 0 14px rgba(243, 226, 176, .55); animation: tgRing 3.8s ease-out infinite;
+}
+.tg-ring.b { animation-delay: .76s; }
+@keyframes tgRing { 0%, 30% { opacity: 0; transform: scale(.3); } 32% { opacity: 1; transform: scale(.45); } 48%, 100% { opacity: 0; transform: scale(1.4); } }
+.tg-spark b { position: absolute; left: -3px; top: -3px; width: 6px; height: 6px; border-radius: 50%; background: #fff3c9; box-shadow: 0 0 8px 2px rgba(243, 226, 176, .95); opacity: 0; animation: tgSpark 3.8s ease-out infinite; }
+@keyframes tgSpark {
+  0%, 30% { opacity: 0; transform: rotate(var(--a)) translateY(-44px) scale(.6); }
+  32% { opacity: 1; }
+  46% { opacity: 0; transform: rotate(var(--a)) translateY(-104px) scale(1); }
+  50% { opacity: 0; transform: rotate(var(--a)) translateY(-44px) scale(.6); }
+  52% { opacity: 1; }
+  66%, 100% { opacity: 0; transform: rotate(var(--a)) translateY(-104px) scale(1); }
+}
+.seal { animation: sealPress 3.8s ease-in-out infinite; }
+.gate.opening .seal { animation: none; }
+@keyframes sealPress { 0%, 29%, 39%, 49%, 59%, 100% { scale: 1; } 33%, 53% { scale: .94; } }
+
+/* first page: a gold-rimmed button above the dock, with the hand rising from behind it */
+.film-scroll { visibility: hidden; } /* keeps its space; the guide below replaces it */
+#swipe {
+  position: fixed; left: 50%; bottom: calc(84px + env(safe-area-inset-bottom)); translate: -50% 0; z-index: 49; display: block;
+  text-decoration: none; opacity: 0; visibility: hidden; transition: opacity .5s ease, visibility 0s linear .5s; -webkit-tap-highlight-color: transparent;
+}
+.is-open #swipe { opacity: 1; visibility: visible; transition: opacity .7s ease 2.2s, visibility 0s linear 2.2s; }
+.is-open #swipe.gone { opacity: 0; visibility: hidden; transition: opacity .35s ease, visibility 0s linear .35s; }
+.sw-pill {
+  position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 10px; height: 50px; padding: 0 20px; border-radius: 999px;
+  border: 2px solid transparent; overflow: hidden; white-space: nowrap; font-family: var(--f-bn); font-size: 17px; color: #f5fcf9; text-shadow: 0 1px 2px rgba(0, 0, 0, .45);
+  background: linear-gradient(180deg, #2f7d6a, #143a31) padding-box, linear-gradient(105deg, #9a7b3d, #f3e2b0 25%, #ffffff 33%, #c8a965 55%, #e6d39d 77%, #9a7b3d) border-box;
+  animation: swGlow 2.4s ease-in-out infinite;
+}
+.lang-en .sw-pill { font-family: var(--f-en); font-weight: 600; font-size: 15px; letter-spacing: .14em; text-transform: uppercase; }
+.sw-pill::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(105deg, transparent 35%, rgba(233, 251, 244, .34) 50%, transparent 65%); transform: translateX(-120%); animation: swSheen 3.6s ease-in-out 1s infinite; }
+@keyframes swSheen { 0%, 60% { transform: translateX(-120%); } 100% { transform: translateX(120%); } }
+@keyframes swGlow {
+  0%, 100% { box-shadow: inset 0 0 0 1px rgba(233, 251, 244, .25), 0 12px 24px -10px rgba(0, 0, 0, .7), 0 0 0 0 rgba(230, 211, 157, .6); }
+  60% { box-shadow: inset 0 0 0 1px rgba(233, 251, 244, .25), 0 12px 24px -10px rgba(0, 0, 0, .7), 0 0 0 11px rgba(230, 211, 157, 0); }
+}
+.sw-c { width: 15px; height: 18px; flex: 0 0 15px; fill: none; stroke: #f3e2b0; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; animation: swChev 1.2s ease-in-out infinite; }
+@keyframes swChev { 0%, 100% { transform: translateY(3px); opacity: .45; } 50% { transform: translateY(-3px); opacity: 1; } }
+.sw-stage { position: absolute; left: 50%; bottom: 25px; width: 190px; height: 150px; margin-left: -95px; overflow: hidden; pointer-events: none; }
+.sw-move { position: absolute; left: 50%; top: 84px; width: 82px; height: 90px; margin-left: -16px; animation: swMove 2.4s cubic-bezier(.45, .05, .3, 1) infinite; }
+.sw-move img { display: block; width: 100%; height: auto; max-width: none; transform-origin: 16px 2px; rotate: 18deg; filter: drop-shadow(0 6px 8px rgba(0, 0, 0, .45)); }
+.sw-touch { position: absolute; z-index: 1; left: 3px; top: -11px; width: 26px; height: 26px; border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 243, 201, .95), rgba(243, 226, 176, .35) 60%, transparent); animation: swTouch 2.4s ease-out infinite; }
+@keyframes swMove { 0% { transform: translateY(50px); opacity: 0; } 12% { transform: translateY(36px); opacity: 1; } 22% { transform: translateY(36px) scale(.97); } 66% { transform: translateY(-26px); opacity: 1; } 82%, 100% { transform: translateY(-36px); opacity: 0; } }
+@keyframes swTouch { 0%, 14% { opacity: 0; transform: scale(.4); } 24% { opacity: 1; transform: scale(1); } 62% { opacity: 1; transform: scale(1.25); } 78%, 100% { opacity: 0; transform: scale(1.7); } }
+@keyframes swMoveDown { 0% { transform: translateY(-30px); opacity: 0; } 14% { opacity: 1; } 62% { transform: translateY(0); opacity: 1; } 72% { transform: translateY(0) scale(.97); opacity: 1; } 88%, 100% { transform: translateY(-8px); opacity: 0; } }
+#swipe .mouse { display: none; }
+@media (max-width: 400px) { .sw-pill { padding: 0 15px; gap: 8px; } }
+@media (hover: hover) and (pointer: fine) {
+  #swipe .touch { display: none; }
+  #swipe span.mouse { display: inline; }
+  .sw-c { rotate: 180deg; }
+  .sw-stage { -webkit-mask-image: linear-gradient(180deg, transparent 8%, #000 34%); mask-image: linear-gradient(180deg, transparent 8%, #000 34%); }
+  .sw-move { top: 113px; animation-name: swMoveDown; }
+  .sw-move img { rotate: 198deg; }
+  .sw-touch { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tg-hand, .tg-ring, .tg-spark b, .seal, .sw-pill, .sw-pill::after, .sw-c, .sw-move, .sw-touch { animation: none !important; }
+  .tg-ring, .tg-spark b { opacity: 0; }
+  .sw-touch { opacity: 1; }
+}
