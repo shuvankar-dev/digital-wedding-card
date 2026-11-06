@@ -746,6 +746,150 @@
   })();
 
   /* =========================================================
+     The date: month calendar → hearts on the day → the date
+     ========================================================= */
+  const DateReveal = (() => {
+    const stage = $('#calStage');
+    const heart = $('#calHeart');
+    const num = $('#calNum');
+    const WEEK = {
+      bn: ['রবি', 'সোম', 'মঙ্গল', 'বুধ', 'বৃহঃ', 'শুক্র', 'শনি'],
+      en: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+    };
+    const COLORS = ['#d06d84', '#e9a3ae', '#a8405a', '#c8a965'];
+    const wait = (ms) => new Promise((r) => { setTimeout(r, ms); });
+
+    function build() {
+      const grid = $('#calGrid');
+      const [y, m, day] = CONFIG.weddingStart.slice(0, 10).split('-').map(Number);
+      const blanks = new Date(Date.UTC(y, m - 1, 1)).getUTCDay();
+      const days = new Date(Date.UTC(y, m, 0)).getUTCDate();
+      let i = 0;
+      const cell = (bn, en, cls) => {
+        const c = document.createElement('span');
+        c.className = `cal-cell ${cls}`;
+        c.style.setProperty('--i', i++);
+        c.innerHTML = `<span class="bn">${bn}</span><span class="en">${en}</span>`;
+        grid.appendChild(c);
+      };
+      WEEK.bn.forEach((d, n) => cell(d, WEEK.en[n], 'cal-wd'));
+      for (let n = 0; n < blanks; n++) grid.appendChild(document.createElement('span'));
+      for (let d = 1; d <= days; d++) cell(toBn(d), d, d === day ? 'is-day' : '');
+    }
+
+    // one small heart travelling across the stage
+    function spark(frames, delay, duration, size) {
+      const s = document.createElementNS(SVGNS, 'svg');
+      s.setAttribute('class', 'cal-spark');
+      s.setAttribute('viewBox', '0 0 90 80');
+      s.setAttribute('width', size);
+      s.setAttribute('height', size * 0.89);
+      s.setAttribute('fill', pick(COLORS));
+      el('use', { href: '#heart', width: 90, height: 80 }, s);
+      stage.appendChild(s);
+      s.animate(frames, { delay, duration, easing: 'ease-in-out', fill: 'backwards' }).onfinish = () => s.remove();
+    }
+    const at = (x, y, scale) => `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${scale})`;
+    function gather(x, y) {
+      for (let i = 0; i < 9; i++) {
+        const a = rand(0, 6.28);
+        const r = rand(120, 190);
+        const sx = x + Math.cos(a) * r;
+        const sy = y + Math.sin(a) * r;
+        const mx = (sx + x) / 2 + Math.sin(a) * 34;
+        const my = (sy + y) / 2 - Math.cos(a) * 34;
+        spark([
+          { transform: at(sx, sy, 0.5), opacity: 0 },
+          { transform: at(mx, my, 1), opacity: 1, offset: 0.55 },
+          { transform: at(x - 7, y - 6, 0.4), opacity: 0.9 },
+        ], i * 70, 900, 20);
+      }
+    }
+    function burst(x, y, n, reach) {
+      for (let i = 0; i < n; i++) {
+        const a = (i / n) * 6.28 + rand(-0.2, 0.2);
+        const r = rand(reach * 0.6, reach);
+        spark([
+          { transform: at(x - 7, y - 6, 0.4), opacity: 1 },
+          { transform: at(x + Math.cos(a) * r, y + Math.sin(a) * r, 1), opacity: 0 },
+        ], rand(0, 120), rand(800, 1200), rand(13, 20));
+      }
+    }
+
+    async function play() {
+      const add = (c) => stage.classList.add(c);
+      add('s-cal');
+      await wait(2000); // time to take in the whole month
+
+      add('s-love');
+      const s = stage.getBoundingClientRect();
+      const c = $('.cal-cell.is-day', stage).getBoundingClientRect();
+      const cx = c.left + c.width / 2 - s.left;
+      const cy = c.top + c.height / 2 - s.top;
+      gather(cx, cy);
+      await wait(1250);
+
+      // a heart opens on the day and beats twice
+      add('s-heart');
+      const on = `translate(${(cx - heart.offsetWidth / 2).toFixed(1)}px, ${(cy - heart.offsetHeight / 2).toFixed(1)}px)`;
+      const pop = heart.animate([
+        { transform: `${on} scale(0)` },
+        { transform: `${on} scale(1.25)`, offset: 0.6 },
+        { transform: `${on} scale(1)` },
+      ], { duration: 520, easing: 'ease-out', fill: 'both' });
+      await pop.finished;
+      burst(cx, cy, 8, 70);
+      const beat = heart.animate([
+        { transform: `${on} scale(1)` },
+        { transform: `${on} scale(1.2)`, offset: 0.2 },
+        { transform: `${on} scale(1)`, offset: 0.45 },
+        { transform: `${on} scale(1.2)`, offset: 0.65 },
+        { transform: `${on} scale(1)` },
+      ], { duration: 1150, easing: 'ease-in-out', fill: 'both' });
+      await beat.finished;
+
+      // the heart melts away and the 12 travels to its place in the plain date
+      add('s-reveal');
+      const fade = heart.animate([
+        { transform: `${on} scale(1)`, opacity: 1 },
+        { transform: `${on} scale(1.5)`, opacity: 0 },
+      ], { duration: 500, easing: 'ease-out', fill: 'both' });
+      const n = num.getBoundingClientRect();
+      const fly = num.animate([
+        { transform: `translate(${(c.left + c.width / 2 - n.left - n.width / 2).toFixed(1)}px, ${(c.top + c.height / 2 - n.top - n.height / 2).toFixed(1)}px) scale(.32)` },
+        { transform: 'none' },
+      ], { duration: 1000, easing: 'cubic-bezier(.3, .8, .2, 1)', fill: 'both' });
+      await fly.finished;
+      await wait(350);
+
+      // the card folds away so the date sits on the page like any other line
+      stage.style.height = `${stage.offsetHeight}px`;
+      void stage.offsetHeight;
+      add('s-fold');
+      stage.style.height = `${$('.cal-date', stage).offsetHeight}px`;
+      await wait(850);
+      add('s-done');
+      stage.style.height = '';
+      [pop, beat, fade, fly].forEach((a) => a.cancel());
+      heart.remove();
+    }
+
+    function arm() {
+      if (reduceMotion || !heart.animate) {
+        stage.classList.add('s-cal', 's-reveal', 's-fold', 's-done');
+        return;
+      }
+      const seen = new IntersectionObserver((e) => {
+        if (!e[0].isIntersecting) return;
+        seen.disconnect();
+        play();
+      }, { threshold: 0.5 });
+      seen.observe(stage);
+    }
+    return { build, arm };
+  })();
+
+  /* =========================================================
      Gatefold intro
      ========================================================= */
   function initGate() {
@@ -781,6 +925,7 @@
         document.body.classList.remove('is-sealed');
         document.body.classList.add('is-open');
         revealVisible();
+        DateReveal.arm();
       }, reduceMotion ? 100 : 1300);
       setTimeout(() => gate.classList.add('opened'), reduceMotion ? 150 : 1900);
       setTimeout(() => gate.remove(), reduceMotion ? 400 : 2800);
@@ -894,6 +1039,7 @@
     tickCountdown();
     setInterval(tickCountdown, 1000);
     initReveal();
+    DateReveal.build();
     Music.init();
     initGate();
     initShare();

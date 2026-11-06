@@ -14,7 +14,7 @@ runs anywhere that serves files, including GitHub Pages.
 | --- | --- |
 | Fold-open card | A closed two-panel card with "শুভ \| বিবাহ" and "প্রীতি \| শুভঙ্কর" split across the seam. Tapping the Ganesh medallion swings both panels open while a shower of rose petals, marigolds and jasmine bursts out of it. A tap anywhere else starts the music and nudges the medallion; there is also a music button in the corner. |
 | শুভ বিবাহ (opening scene) | The couple's painted portrait on a soft teal floral backdrop under "শুভ বিবাহ", with swaying marigold garlands, bells and fairy lights, gold sparkles, butterflies, a slow camera drift and a sweep of light. |
-| সাদর আমন্ত্রণ | Ganesh medallion, the names joined by a heart, the date, the Bengali date, the place and a live countdown. |
+| সাদর আমন্ত্রণ | Ganesh medallion, the names joined by a heart, an animated date (the full December calendar appears, hearts gather on the 12, then the 12 settles into the plain date), the Bengali date, the place and a live countdown. |
 | শুভদৃষ্টি | The couple's second portrait (dhoti-panjabi and red Banarasi, flower garlands) in an arched gold frame, with butterflies and sparkles. |
 | নিমন্ত্রণ | The invitation letter from the bride's parents, under a Ganesh line drawing. |
 | পরিচিতি | The bride and the groom, each with their father and mother. |
