@@ -706,6 +706,25 @@
 
     function cue(name) { scene = name; wake(); }
 
+    async function load(name) {
+      if (!ctx) return;
+      for (let tries = 0; tries < 3; tries++) {
+        try {
+          const r = await fetch(M[name]);
+          if (!r.ok) throw new Error(r.status);
+          const data = await r.arrayBuffer();
+          buffers[name] = await new Promise((res, rej) => ctx.decodeAudioData(data, res, rej));
+          sync();
+          return;
+        } catch (e) {
+          await new Promise((res) => { setTimeout(res, 1500); });
+        }
+      }
+      mode = 'element';
+      current = null;
+      sync();
+    }
+
     function init() {
       if (AC) {
         ctx = new AC();
@@ -715,13 +734,6 @@
         ctx.onstatechange = () => sync();
         // let iPhones play it even with the ring/silent switch on silent
         if (navigator.audioSession) { try { navigator.audioSession.type = 'playback'; } catch (e) { /* older Safari */ } }
-        ['envelope', 'main'].forEach((name) => {
-          fetch(M[name])
-            .then((r) => { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
-            .then((data) => new Promise((res, rej) => ctx.decodeAudioData(data, res, rej)))
-            .then((buf) => { buffers[name] = buf; sync(); })
-            .catch(() => { mode = 'element'; current = null; sync(); });
-        });
       }
       // the first tap anywhere starts the mood on screen (the seal, its hint
       // and the music buttons handle it themselves)
@@ -742,7 +754,7 @@
       setUI(on);
       sync(); // plays right away where the browser allows sound without a tap
     }
-    return { init, cue };
+    return { init, cue, load };
   })();
 
   /* =========================================================
@@ -890,6 +902,67 @@
   })();
 
   /* =========================================================
+     First visit: nothing opens half-loaded
+     The envelope waits for the fonts and the opening photo (never longer
+     than 10 s), then everything else arrives in page order behind it.
+     ========================================================= */
+  const Preload = (() => {
+    const pause = (ms) => new Promise((r) => { setTimeout(r, ms); });
+    let markReady;
+    const ready = new Promise((r) => { markReady = r; });
+
+    // resolves with the loaded address once decoded, retrying a failed download
+    function fetchImage(src) {
+      return new Promise((done) => {
+        const probe = new Image();
+        let tries = 0;
+        const attempt = () => { probe.src = tries ? `${src}?retry=${tries}` : src; };
+        probe.onload = () => {
+          const shown = () => done(probe.src);
+          if (probe.decode) probe.decode().then(shown, shown); else shown();
+        };
+        probe.onerror = () => {
+          tries += 1;
+          if (tries > 3) done(null); else setTimeout(attempt, 1500 * tries);
+        };
+        attempt();
+      });
+    }
+    async function photo(img) {
+      const url = await fetchImage(img.dataset.src);
+      if (url) { img.src = url; img.removeAttribute('data-src'); }
+    }
+    const fonts = (list) => (document.fonts ? Promise.all(list.map((f) => document.fonts.load(f, 'শুভ Aa').catch(() => {}))) : Promise.resolve());
+    const FONTS = {
+      bn: ['40px Galada', '16px "Tiro Bangla"'],
+      en: ['40px "Pinyon Script"', '600 16px "Cormorant Garamond"', 'italic 16px "Cormorant Garamond"'],
+    };
+
+    async function start() {
+      const hero = $('.film-img');
+      await Promise.race([
+        Promise.all([
+          fonts(FONTS[lang]),
+          fetchImage(hero.getAttribute('src')).then((url) => { if (url && url !== hero.src) hero.src = url; }),
+        ]),
+        pause(10000),
+      ]);
+      $('#gate').classList.remove('loading');
+      markReady();
+      // one stalled download must not hold up the rest
+      const steps = [
+        () => Music.load('envelope'),
+        () => Music.load('main'),
+        ...$$('img[data-src]').map((img) => () => photo(img)),
+        () => fetchImage('assets/images/floral.webp').then(() => document.body.classList.add('floral')),
+        () => fonts(FONTS[lang === 'bn' ? 'en' : 'bn']),
+      ];
+      for (const step of steps) await Promise.race([step(), pause(15000)]);
+    }
+    return { start, ready };
+  })();
+
+  /* =========================================================
      Gatefold intro
      ========================================================= */
   function initGate() {
@@ -908,12 +981,8 @@
     }
 
     let opened = false;
-    const open = () => {
-      if (opened) return;
-      opened = true;
+    const unfold = () => {
       gate.classList.add('opening');
-      // switch to the second mood inside the tap itself so phones allow it
-      Music.cue('main');
       // a shower of flowers bursts from the seal, in front of the opening doors
       const petals = $('#petals');
       petals.classList.add('front');
@@ -929,6 +998,14 @@
       }, reduceMotion ? 100 : 1300);
       setTimeout(() => gate.classList.add('opened'), reduceMotion ? 150 : 1900);
       setTimeout(() => gate.remove(), reduceMotion ? 400 : 2800);
+    };
+    const open = () => {
+      if (opened) return;
+      opened = true;
+      // switch to the second mood inside the tap itself so phones allow it
+      Music.cue('main');
+      // a tap while the card is still loading is remembered, not lost
+      Preload.ready.then(unfold);
     };
     seal.addEventListener('click', open);
     $('.gate-hint').addEventListener('click', open);
@@ -1029,25 +1106,28 @@
   /* =========================================================
      Boot
      ========================================================= */
+  // one failing step must never leave a guest stuck on the envelope
+  function safely(step) {
+    try { step(); return true; } catch (e) { console.error(e); return false; }
+  }
   function boot() {
     const params = new URLSearchParams(location.search);
-    renderFamily();
-    $$('.mandala-src').forEach(buildMandala);
-    buildToran();
-    setLang(params.get('lang') || store.get('wc-lang') || 'bn');
-    $('#langBtn').addEventListener('click', () => setLang(lang === 'bn' ? 'en' : 'bn'));
-    tickCountdown();
-    setInterval(tickCountdown, 1000);
-    initReveal();
-    DateReveal.build();
-    Music.init();
-    initGate();
-    initShare();
-    initHeroVideo();
-    if (!reduceMotion) $$('.glow-fx').forEach(sparkleLayer);
-    Butterflies.init();
+    safely(renderFamily);
+    safely(() => $$('.mandala-src').forEach(buildMandala));
+    safely(buildToran);
+    safely(() => setLang(params.get('lang') || store.get('wc-lang') || 'bn'));
+    safely(() => $('#langBtn').addEventListener('click', () => setLang(lang === 'bn' ? 'en' : 'bn')));
+    safely(() => { tickCountdown(); setInterval(tickCountdown, 1000); });
+    safely(initReveal);
+    safely(DateReveal.build);
+    safely(Music.init);
+    window.cardReady = safely(initGate);
+    if (window.cardReady) Preload.start();
+    safely(initShare);
+    safely(initHeroVideo);
+    safely(() => { if (!reduceMotion) $$('.glow-fx').forEach(sparkleLayer); });
+    safely(Butterflies.init);
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
-  else boot();
+  boot();
 })();

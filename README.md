@@ -57,6 +57,14 @@ All the editable details are at the top of `js/main.js` in `CONFIG`:
 - **Music:** `music` (the two files, the loop blend and the volume).
 - **Family details:** the `FAMILY` object just below `CONFIG`.
 
+### First visit
+
+Most guests open the card once, so it never opens half-loaded. The envelope shows
+a gold ring and "প্রস্তুত হচ্ছে…" until the fonts and opening photo are ready (at most
+10 seconds), and a tap during that time is remembered. Behind it, the music and the
+other photos load in page order, and a failed download retries by itself. If the
+script cannot run at all, the card shows everything without the animations.
+
 ### Images
 
 | File | Used for |

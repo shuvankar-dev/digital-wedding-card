@@ -1,7 +1,8 @@
 <!doctype html>
-<html lang="bn">
+<html lang="bn" class="fallback">
 <head>
   <meta charset="utf-8">
+  <script>document.documentElement.className = '';</script>
   <title>শুভ বিবাহ · প্রীতি ও শুভঙ্কর</title>
   <!-- WhatsApp / Facebook preview: keep these first, with full web addresses. Do not add og:url. -->
   <meta property="og:type" content="website">
@@ -21,11 +22,9 @@
   <meta name="theme-color" content="#255543">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="preload" as="image" href="assets/images/hero.webp" fetchpriority="high">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Galada&family=Tiro+Bangla:ital@0;1&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Pinyon+Script&display=swap" rel="stylesheet">
+  <link rel="preload" as="font" href="assets/fonts/galada-bengali.woff2" type="font/woff2" crossorigin>
+  <link rel="preload" as="font" href="assets/fonts/tiro-bangla-bengali.woff2" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="css/style.css">
-  <noscript><style>.gate { display: none; } .reveal { opacity: 1; transform: none; } body.is-sealed { overflow: auto; height: auto; } .dock { transform: translate(-50%, 0); } .film-img { transform: none; } .film-head > *, .film-foot { opacity: 1; } .cal-stage { opacity: 1; transform: none; min-height: 0; padding: 0; background: none; box-shadow: none; } .cal { display: none; } .cal-final { position: static; } .cal-date b, .cal-date i, .cal-date > span { opacity: 1; }</style></noscript>
 </head>
 <body class="lang-bn is-sealed">
 
@@ -211,7 +210,7 @@
   </svg>
 
   <!-- ============ GATEFOLD INTRO (fold-open card) ============ -->
-  <div class="gate" id="gate" aria-label="নিমন্ত্রণপত্র খুলুন">
+  <div class="gate loading" id="gate" aria-label="নিমন্ত্রণপত্র খুলুন">
     <div class="gate-door gate-left">
       <div class="door-face">
         <div class="door-blooms" aria-hidden="true">
@@ -250,7 +249,7 @@
 
     <div class="gate-foot">
       <p class="gate-guest" id="guestLine" hidden></p>
-      <p class="gate-hint"><span class="bn">খুলতে গণেশ চিহ্নে ছুঁয়ে দিন</span><span class="en">Tap Ganesha to open</span></p>
+      <p class="gate-hint"><span class="hint-ready"><span class="bn">খুলতে গণেশ চিহ্নে ছুঁয়ে দিন</span><span class="en">Tap Ganesha to open</span></span><span class="hint-wait"><span class="bn">নিমন্ত্রণপত্র প্রস্তুত হচ্ছে…</span><span class="en">Preparing your invitation…</span></span></p>
     </div>
   </div>
 
@@ -262,7 +261,7 @@
     <!-- ============ FILM: the painted village wedding, alive ============ -->
     <section class="film" id="home" aria-label="শুভ বিবাহ · প্রীতি ও শুভঙ্কর">
       <div class="film-media" aria-hidden="true">
-        <img class="film-img" src="assets/images/hero.webp" alt="" width="1088" height="1920" fetchpriority="high" decoding="async">
+        <img class="film-img" src="assets/images/hero.webp" alt="" width="1200" height="2100" fetchpriority="high" decoding="async">
         <video class="film-video" id="heroVideo" muted loop playsinline preload="none" hidden>
           <source type="video/mp4">
         </video>
@@ -362,7 +361,7 @@
 
       <figure class="portrait reveal">
         <div class="portrait-frame">
-          <img class="portrait-img" src="assets/images/couple.webp" alt="প্রীতি ও শুভঙ্কর — ধুতি-পাঞ্জাবিতে বর, লাল বেনারসিতে কনে, দুজনের গলায় ফুলের মালা" width="1024" height="1536" loading="lazy" decoding="async">
+          <img class="portrait-img" data-src="assets/images/couple.webp" alt="প্রীতি ও শুভঙ্কর — ধুতি-পাঞ্জাবিতে বর, লাল বেনারসিতে কনে, দুজনের গলায় ফুলের মালা" width="840" height="1260" decoding="async">
           <span class="portrait-shine" aria-hidden="true"></span>
           <svg class="portrait-sparkles" viewBox="0 0 100 150" preserveAspectRatio="none" aria-hidden="true">
             <path class="spk" d="M0 -3 L.7 -.7 L3 0 L.7 .7 L0 3 L-.7 .7 L-3 0 L-.7 -.7 Z" transform="translate(18 22)"/>
@@ -418,7 +417,7 @@
 
       <article class="person-card bride-card reveal" id="brideCard">
         <span class="pc-ribbon"><span class="bn">আমাদের কন্যা</span><span class="en">Our Daughter</span></span>
-        <div class="pc-frame"><img class="pc-photo" src="assets/images/bride.webp" alt="পাত্রী প্রীতি / The bride, Prity" width="600" height="750" loading="lazy" decoding="async"></div>
+        <div class="pc-frame"><img class="pc-photo" data-src="assets/images/bride.webp" alt="পাত্রী প্রীতি / The bride, Prity" width="600" height="750" decoding="async"></div>
         <p class="pc-role"><span class="bn">পাত্রী</span><span class="en">Bride</span></p>
         <h3 class="pc-name"><span class="bn">কল্যাণীয়া প্রীতি</span><span class="en">Prity</span></h3>
         <dl class="pc-parents" data-list="bride"></dl>
@@ -430,7 +429,7 @@
 
       <article class="person-card groom-card reveal">
         <span class="pc-ribbon pc-ribbon-alt"><span class="bn">আমাদের জামাই</span><span class="en">Our Son-in-law</span></span>
-        <div class="pc-frame"><img class="pc-photo" src="assets/images/groom.webp" alt="পাত্র শুভঙ্কর / The groom, Shubhankar" width="600" height="750" loading="lazy" decoding="async"></div>
+        <div class="pc-frame"><img class="pc-photo" data-src="assets/images/groom.webp" alt="পাত্র শুভঙ্কর / The groom, Shubhankar" width="600" height="750" decoding="async"></div>
         <p class="pc-role"><span class="bn">পাত্র</span><span class="en">Groom</span></p>
         <h3 class="pc-name"><span class="bn">কল্যাণীয় শুভঙ্কর</span><span class="en">Shubhankar</span></h3>
         <dl class="pc-parents" data-list="groom"></dl>
@@ -446,7 +445,7 @@
 
       <article class="event reveal">
         <figure class="ev-photo">
-          <img src="assets/images/varmala.webp" alt="মালাবদল — প্রীতি ও শুভঙ্কর / Varmala — Prity and Shubhankar" width="900" height="985" loading="lazy" decoding="async">
+          <img data-src="assets/images/varmala.webp" alt="মালাবদল — প্রীতি ও শুভঙ্কর / Varmala — Prity and Shubhankar" width="900" height="985" decoding="async">
         </figure>
         <h3 class="ev-title"><span class="bn">শুভবিবাহ</span><span class="en">Shubho Bibaho</span></h3>
         <div class="ev-date">
@@ -584,6 +583,16 @@
     <a class="dock-btn dock-wa" id="waDock" target="_blank" rel="noopener" aria-label="WhatsApp"><svg class="i"><use href="#i-wa"/></svg></a>
   </nav>
 
-  <script src="js/main.js"></script>
+  <script>
+    // if the card's script cannot run, show everything without the animations
+    function cardFallback() {
+      if (window.cardReady) return;
+      document.documentElement.className = 'fallback';
+      var imgs = document.querySelectorAll('img[data-src]');
+      for (var i = 0; i < imgs.length; i++) { imgs[i].src = imgs[i].getAttribute('data-src'); imgs[i].removeAttribute('data-src'); }
+    }
+  </script>
+  <script src="js/main.js" onerror="cardFallback()"></script>
+  <script>cardFallback();</script>
 </body>
 </html>
